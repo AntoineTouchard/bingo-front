@@ -194,9 +194,9 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between flex-col md:flex-row gap-[15px] md:gap-[0px] items-center mb-8">
           <h1 className="text-3xl font-bold text-indigo-800">Bingo Anytime</h1>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <button
               onClick={addPlayer}
               disabled={playerStates.length >= MAX_PLAYERS}
