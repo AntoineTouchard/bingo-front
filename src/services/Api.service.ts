@@ -1,9 +1,11 @@
 import axios, { AxiosInstance } from 'axios';
 import { SaveResponse, SavesResponse } from '../types';
 
-// Crée une instance Axios avec la configuration de base
+
+const { hostname, origin } = window.location;
+
 const api: AxiosInstance = axios.create({
-  baseURL: 'http://localhost:3200',
+  baseURL: hostname === 'localhost' ? 'http://localhost:3200' : origin+"/",
   headers: {
     'Content-Type': 'application/json',
   },
