@@ -131,19 +131,6 @@ function App() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-
-      // Save to source file
-      const response = await fetch('/src/bingo.json', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(gameState, null, 2)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save to source file');
-      }
     } catch (error) {
       console.error('Error saving game:', error);
       alert('Erreur lors de la sauvegarde du fichier source');
