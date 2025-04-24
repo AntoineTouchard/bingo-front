@@ -5,7 +5,7 @@ import { SaveResponse, SavesResponse } from '../types';
 const { hostname, origin } = window.location;
 
 const api: AxiosInstance = axios.create({
-  baseURL: hostname === 'localhost' ? 'http://localhost:3200' : origin+"/",
+  baseURL: hostname === 'localhost' ? 'http://localhost:3200' : origin+"/api",
   headers: {
     'Content-Type': 'application/json',
   },
