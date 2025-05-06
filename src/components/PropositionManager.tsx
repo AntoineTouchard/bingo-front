@@ -30,7 +30,7 @@ export const PropositionManager = ({
           value={newProposition}
           onChange={(e) => setNewProposition(e.target.value)}
           placeholder="Nouvelle proposition..."
-          className="flex-1 p-2 border rounded-lg outline-indigo-700"
+          className="flex-1 p-2 border rounded-lg focus:outline-indigo-500"
         />
         <button
           type="submit"
