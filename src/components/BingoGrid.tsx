@@ -137,7 +137,7 @@ export const BingoGrid = ({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Décrivez le contexte..."
-            className="w-full p-2 border rounded-lg"
+            className="w-full p-2 border rounded-lg outline-indigo-700"
             rows={3}
             autoFocus
           />
