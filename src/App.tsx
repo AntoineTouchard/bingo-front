@@ -1,15 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Shuffle, Plus, Save, Upload, Download } from 'lucide-react';
-import { fetchLastSave, saveJson } from './services/Api.service';
-import { GameState, initialPropositions, PlayerState, Proposition } from './types';
-import { generateGrid, generateGrids } from './services/utils';
-import { PropositionManager } from './components/PropositionManager';
-import { BingoGrid } from './components/BingoGrid';
-import { SeePreviousHistory } from './components/SeePreviousHistory';
-
+import React, { useState, useEffect } from "react";
+import { Shuffle, Plus, Save, Upload, Download } from "lucide-react";
+import { fetchLastSave, saveJson } from "./services/Api.service";
+import {
+  GameState,
+  initialPropositions,
+  PlayerState,
+  Proposition,
+} from "./types";
+import { generateGrid, generateGrids } from "./services/utils";
+import { PropositionManager } from "./components/PropositionManager";
+import { BingoGrid } from "./components/BingoGrid";
+import { SeePreviousHistory } from "./components/SeePreviousHistory";
 
 function App() {
-  const [propositions, setPropositions] = useState<Proposition[]>(initialPropositions);
+  const [propositions, setPropositions] =
+    useState<Proposition[]>(initialPropositions);
   const [playerStates, setPlayerStates] = useState<PlayerState[]>([]);
   const [isChanged, setIsChanged] = useState<boolean>(false);
   const ITEMS_PER_GRID = 6;
@@ -18,12 +23,14 @@ function App() {
 
   const generateNewGrids = (playerCount: number = playerStates.length || 6) => {
     const grids = generateGrids(propositions, playerCount, ITEMS_PER_GRID);
-    setPlayerStates(prev => {
-      const newStates = Array(playerCount).fill(null).map((_, i) => ({
-        name: prev[i]?.name || `Joueur ${i + 1}`,
-        grid: grids[i],
-        validatedItems: new Map()
-      }));
+    setPlayerStates((prev) => {
+      const newStates = Array(playerCount)
+        .fill(null)
+        .map((_, i) => ({
+          name: prev[i]?.name || `Joueur ${i + 1}`,
+          grid: grids[i],
+          validatedItems: new Map(),
+        }));
       return newStates;
     });
     setIsChanged(true);
@@ -32,138 +39,157 @@ function App() {
   const addPlayer = () => {
     if (playerStates.length < MAX_PLAYERS) {
       const newGrid = generateGrid(propositions, ITEMS_PER_GRID);
-      setPlayerStates(prev => [...prev, {
-        name: `Joueur ${prev.length + 1}`,
-        grid: newGrid,
-        validatedItems: new Map()
-      }]);
+      setPlayerStates((prev) => [
+        ...prev,
+        {
+          name: `Joueur ${prev.length + 1}`,
+          grid: newGrid,
+          validatedItems: new Map(),
+        },
+      ]);
     }
     setIsChanged(true);
   };
 
   const removePlayer = (index: number) => {
     if (playerStates.length > MIN_PLAYERS) {
-      setPlayerStates(prev => prev.filter((_, i) => i !== index));
+      setPlayerStates((prev) => prev.filter((_, i) => i !== index));
     }
     setIsChanged(true);
   };
 
   const updatePlayerName = (index: number, newName: string) => {
-    setPlayerStates(prev => prev.map((state, i) => 
-      i === index ? { ...state, name: newName } : state
-    ));
+    setPlayerStates((prev) =>
+      prev.map((state, i) =>
+        i === index ? { ...state, name: newName } : state
+      )
+    );
     setIsChanged(true);
   };
 
-  const validateItem = (playerIndex: number, itemIndex: number, description: string) => {
-    setPlayerStates(prev => prev.map((state, i) => {
-      if (i === playerIndex) {
-        const newValidatedItems = new Map(state.validatedItems);
-        newValidatedItems.set(itemIndex, {
-          propositionId: state.grid[itemIndex],
-          description,
-          timestamp: Date.now()
-        });
-        return { ...state, validatedItems: newValidatedItems };
-      }
-      return state;
-    }));
+  const validateItem = (
+    playerIndex: number,
+    itemIndex: number,
+    description: string
+  ) => {
+    setPlayerStates((prev) =>
+      prev.map((state, i) => {
+        if (i === playerIndex) {
+          const newValidatedItems = new Map(state.validatedItems);
+          newValidatedItems.set(itemIndex, {
+            propositionId: state.grid[itemIndex],
+            description,
+            timestamp: Date.now(),
+          });
+          return { ...state, validatedItems: newValidatedItems };
+        }
+        return state;
+      })
+    );
     setIsChanged(true);
   };
 
   const removeValidation = (playerIndex: number, itemIndex: number) => {
-    setPlayerStates(prev => prev.map((state, i) => {
-      if (i === playerIndex) {
-        const newValidatedItems = new Map(state.validatedItems);
-        newValidatedItems.delete(itemIndex);
-        return { ...state, validatedItems: newValidatedItems };
-      }
-      return state;
-    }));
+    setPlayerStates((prev) =>
+      prev.map((state, i) => {
+        if (i === playerIndex) {
+          const newValidatedItems = new Map(state.validatedItems);
+          newValidatedItems.delete(itemIndex);
+          return { ...state, validatedItems: newValidatedItems };
+        }
+        return state;
+      })
+    );
     setIsChanged(true);
   };
 
   const addProposition = (text: string) => {
-    setPropositions(prev => [...prev, { text, id: crypto.randomUUID() }]);
+    setPropositions((prev) => [...prev, { text, id: crypto.randomUUID() }]);
     setIsChanged(true);
   };
 
   const removeProposition = (id: string) => {
-    setPropositions(prev => prev.filter(p => p.id !== id));
+    setPropositions((prev) => prev.filter((p) => p.id !== id));
     setIsChanged(true);
   };
 
   const saveGame = async () => {
     const gameState: GameState = {
-      players: playerStates.map(playerState => ({
+      players: playerStates.map((playerState) => ({
         ...playerState,
-        validatedItems: Array.from(playerState.validatedItems.entries())
+        validatedItems: Array.from(playerState.validatedItems.entries()),
       })),
-      propositions
+      propositions,
     };
-    
+
     try {
-      saveJson(gameState)
+      saveJson(gameState);
       setIsChanged(false);
     } catch (error) {
-      console.error('Error saving game:', error);
-      alert('Erreur lors de la sauvegarde du fichier source');
+      console.error("Error saving game:", error);
+      alert("Erreur lors de la sauvegarde du fichier source");
     }
   };
 
   const downloadGame = async () => {
     const gameState: GameState = {
-      players: playerStates.map(state => ({
+      players: playerStates.map((state) => ({
         ...state,
-        validatedItems: Array.from(state.validatedItems.entries())
+        validatedItems: Array.from(state.validatedItems.entries()),
       })),
-      propositions
+      propositions,
     };
-    
+
     try {
       // Save to file download
-      const blob = new Blob([JSON.stringify(gameState, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(gameState, null, 2)], {
+        type: "application/json",
+      });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = `bingo-anytime-${new Date().toISOString().replace('T', '_').substring(0, 19)}.json`;
+      a.download = `bingo-anytime-${new Date().toISOString().replace("T", "_").substring(0, 19)}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error saving game:', error);
-      alert('Erreur lors de la sauvegarde du fichier source');
+      console.error("Error saving game:", error);
+      alert("Erreur lors de la sauvegarde du fichier source");
     }
   };
 
   const loadLastGame = async () => {
     try {
-      const lastSave = await fetchLastSave()
-      if(!lastSave?.data) {
-        alert('Aucune sauvegarde trouvée');
+      const lastSave = await fetchLastSave();
+      if (!lastSave?.data) {
+        alert("Aucune sauvegarde trouvée");
         return;
       }
       const gameState = JSON.parse(lastSave.data) as GameState;
       setPropositions(gameState.propositions);
-      setPlayerStates(gameState.players.map(player => ({
-        ...player,
-        validatedItems: new Map(player.validatedItems)
-      })));
+      setPlayerStates(
+        gameState.players.map((player) => ({
+          ...player,
+          validatedItems: new Map(player.validatedItems),
+        }))
+      );
     } catch (error) {
-      alert('Erreur lors du chargement du fichier : ' + error);
+      alert("Erreur lors du chargement du fichier : " + error);
       generateNewGrids();
     }
   };
 
   const loadThisGame = (gameState: GameState) => {
     setPropositions(gameState.propositions);
-    setPlayerStates(gameState.players.map(player => ({
-      ...player,
-      validatedItems: new Map(player.validatedItems)
-    })));
+    setPlayerStates(
+      gameState.players.map((player) => ({
+        ...player,
+        validatedItems: new Map(player.validatedItems),
+      }))
+    );
     setIsChanged(true);
-  }
+  };
 
   const loadGame = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -173,13 +199,15 @@ function App() {
         try {
           const gameState = JSON.parse(e.target?.result as string) as GameState;
           setPropositions(gameState.propositions);
-          setPlayerStates(gameState.players.map(player => ({
-            ...player,
-            validatedItems: new Map(player.validatedItems)
-          })));
+          setPlayerStates(
+            gameState.players.map((player) => ({
+              ...player,
+              validatedItems: new Map(player.validatedItems),
+            }))
+          );
         } catch (error) {
-          console.error('Error loading game:', error);
-          alert('Erreur lors du chargement du fichier');
+          console.error("Error loading game:", error);
+          alert("Erreur lors du chargement du fichier");
         }
       };
       reader.readAsText(file);
@@ -215,13 +243,16 @@ function App() {
             <button
               onClick={saveGame}
               disabled={!isChanged}
-              style={{ opacity: isChanged ? 1 : 0.5, pointerEvents: isChanged ? 'auto' : 'none' }}
+              style={{
+                opacity: isChanged ? 1 : 0.5,
+                pointerEvents: isChanged ? "auto" : "none",
+              }}
               className="flex items-center text-sm gap-2 bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
             >
               <Save size={16} />
               Sauvegarder
             </button>
-            <button
+            {/* <button
               onClick={downloadGame}
               className="flex items-center text-sm gap-2 bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
             >
@@ -237,8 +268,8 @@ function App() {
                 onChange={loadGame}
                 className="hidden"
               />
-            </label>
-            <SeePreviousHistory loadThisGame={loadThisGame}/>
+            </label> */}
+            <SeePreviousHistory loadThisGame={loadThisGame} />
             {/* <button
               onClick={loadLastGame}
               disabled={!isChanged}
@@ -259,8 +290,8 @@ function App() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {playerStates.map((state, index) => (
-            <BingoGrid 
-              key={index} 
+            <BingoGrid
+              key={index}
               items={state.grid}
               playerName={state.name}
               onNameChange={(newName) => updatePlayerName(index, newName)}
@@ -268,8 +299,12 @@ function App() {
               isRemovable={playerStates.length > MIN_PLAYERS}
               propositions={propositions}
               validatedItems={state.validatedItems}
-              onValidateItem={(itemIndex, description) => validateItem(index, itemIndex, description)}
-              onRemoveValidation={(itemIndex) => removeValidation(index, itemIndex)}
+              onValidateItem={(itemIndex, description) =>
+                validateItem(index, itemIndex, description)
+              }
+              onRemoveValidation={(itemIndex) =>
+                removeValidation(index, itemIndex)
+              }
             />
           ))}
         </div>
