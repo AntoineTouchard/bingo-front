@@ -104,9 +104,9 @@ export const BingoGrid = ({
                   !isValidated &&
                   setSelectedItem({ index, text: propositionText })
                 }
-                className={`p-4 border-2 rounded-lg cursor-pointer h-[160px] flex flex-col items-center justify-center text-center transition-all duration-200 text-sm ${
+                className={`p-3 border-2 rounded-lg cursor-pointer h-[160px] text-center transition-all duration-200 text-sm ${
                   isValidated
-                    ? "bg-indigo-600 text-white border-indigo-700 shadow-inner overscroll-y-auto"
+                    ? "bg-indigo-600 text-white border-indigo-700 shadow-inner overflow-y-auto"
                     : "border-indigo-200 hover:bg-indigo-50"
                 }`}
               >
