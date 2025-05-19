@@ -106,11 +106,13 @@ export const BingoGrid = ({
                 }
                 className={`p-4 border-2 rounded-lg cursor-pointer h-[160px] flex flex-col items-center justify-center text-center transition-all duration-200 text-sm ${
                   isValidated
-                    ? "bg-indigo-600 text-white border-indigo-700 shadow-inner"
+                    ? "bg-indigo-600 text-white border-indigo-700 shadow-inner overscroll-y-auto"
                     : "border-indigo-200 hover:bg-indigo-50"
                 }`}
               >
-                <div className="text-[14px]">{propositionText}</div>
+                <div className="text-[14px] leading-none">
+                  {propositionText}
+                </div>
                 {isValidated && (
                   <>
                     <div className="mt-2 leading-none text-[12px] italic">
@@ -121,7 +123,7 @@ export const BingoGrid = ({
                         e.stopPropagation();
                         onRemoveValidation(index);
                       }}
-                      className="absolute top-2 right-2 p-1 hover:bg-indigo-700 rounded-full"
+                      className="absolute top-2 right-3 p-1 hover:bg-indigo-700 rounded-full"
                     >
                       <XIcon size={14} />
                     </button>
