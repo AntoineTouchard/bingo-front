@@ -110,7 +110,7 @@ export const BingoGrid = ({
                     : "border-indigo-200 hover:bg-indigo-50"
                 }`}
               >
-                <div className="text-[14px] leading-none">
+                <div className="text-[14px] leading-none text-indigo-600 font-bold">
                   {propositionText}
                 </div>
                 {isValidated && (
