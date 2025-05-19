@@ -3,7 +3,6 @@ import { Proposition, ValidatedItem } from "../types";
 import { Check, Edit2, XIcon } from "lucide-react";
 import { Modal } from "./Modal";
 
-
 interface BingoGridProps {
   items: string[];
   playerName: string;
@@ -16,20 +15,23 @@ interface BingoGridProps {
   onRemoveValidation: (index: number) => void;
 }
 
-export const BingoGrid = ({ 
-  items, 
-  playerName, 
-  onNameChange, 
-  onRemove, 
-  isRemovable, 
+export const BingoGrid = ({
+  items,
+  playerName,
+  onNameChange,
+  onRemove,
+  isRemovable,
   propositions,
   validatedItems,
   onValidateItem,
-  onRemoveValidation
+  onRemoveValidation,
 }: BingoGridProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(playerName);
-  const [selectedItem, setSelectedItem] = useState<{index: number; text: string} | null>(null);
+  const [selectedItem, setSelectedItem] = useState<{
+    index: number;
+    text: string;
+  } | null>(null);
   const [description, setDescription] = useState("");
 
   const handleNameSubmit = () => {
@@ -46,7 +48,7 @@ export const BingoGrid = ({
   };
 
   const getPropositionById = (id: string) => {
-    return propositions.find(p => p.id === id)?.text || '';
+    return propositions.find((p) => p.id === id)?.text || "";
   };
 
   return (
@@ -59,7 +61,7 @@ export const BingoGrid = ({
               value={editedName}
               onChange={(e) => setEditedName(e.target.value)}
               className="text-xl font-bold text-indigo-600 border-b-2 border-indigo-200 focus:border-indigo-600 outline-none"
-              onKeyPress={(e) => e.key === 'Enter' && handleNameSubmit()}
+              onKeyPress={(e) => e.key === "Enter" && handleNameSubmit()}
               autoFocus
             />
             <button
@@ -94,22 +96,27 @@ export const BingoGrid = ({
           const isValidated = validatedItems.has(index);
           const validatedItem = validatedItems.get(index);
           const propositionText = getPropositionById(itemId);
-          
+
           return (
             <div key={index} className="relative">
-              <div 
-                onClick={() => !isValidated && setSelectedItem({ index, text: propositionText })}
-                className={`p-4 border-2 rounded-lg cursor-pointer h-[120px] flex flex-col items-center justify-center text-center transition-all duration-200 text-sm ${
+              <div
+                onClick={() =>
+                  !isValidated &&
+                  setSelectedItem({ index, text: propositionText })
+                }
+                className={`p-4 border-2 rounded-lg cursor-pointer h-[160px] flex flex-col items-center justify-center text-center transition-all duration-200 text-sm ${
                   isValidated
-                    ? 'bg-indigo-600 text-white border-indigo-700 shadow-inner'
-                    : 'border-indigo-200 hover:bg-indigo-50'
+                    ? "bg-indigo-600 text-white border-indigo-700 shadow-inner"
+                    : "border-indigo-200 hover:bg-indigo-50"
                 }`}
               >
-                <div>{propositionText}</div>
+                <div className="text-[14px]">{propositionText}</div>
                 {isValidated && (
                   <>
-                    <div className="mt-2 text-xs italic">{validatedItem?.description}</div>
-                    <button 
+                    <div className="mt-2 leading-none text-[12px] italic">
+                      {validatedItem?.description}
+                    </div>
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         onRemoveValidation(index);
@@ -127,11 +134,13 @@ export const BingoGrid = ({
       </div>
 
       <Modal
-        isOpen={selectedItem !== null} 
+        isOpen={selectedItem !== null}
         onClose={() => setSelectedItem(null)}
       >
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Validation de la proposition</h3>
+          <h3 className="text-lg font-semibold">
+            Validation de la proposition
+          </h3>
           <p className="text-gray-600">{selectedItem?.text}</p>
           <textarea
             value={description}
@@ -160,4 +169,4 @@ export const BingoGrid = ({
       </Modal>
     </div>
   );
-}
+};
