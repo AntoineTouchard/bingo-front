@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Shuffle, Plus, Save, Upload, Download } from "lucide-react";
+import { Shuffle, Plus, Save, Upload, Download, User } from "lucide-react";
 import { fetchLastSave, saveJson } from "./services/Api.service";
 import {
   GameState,
@@ -11,12 +11,15 @@ import { generateGrid, generateGrids } from "./services/utils";
 import { PropositionManager } from "./components/PropositionManager";
 import { BingoGrid } from "./components/BingoGrid";
 import { SeePreviousHistory } from "./components/SeePreviousHistory";
+import { io } from "socket.io-client";
+import { Tooltip } from "./components/Tooltip";
 
 function App() {
   const [propositions, setPropositions] =
     useState<Proposition[]>(initialPropositions);
   const [playerStates, setPlayerStates] = useState<PlayerState[]>([]);
   const [isChanged, setIsChanged] = useState<boolean>(false);
+  const [playerOnline, setPlayerOnline] = useState<number>();
   const ITEMS_PER_GRID = 6;
   const MIN_PLAYERS = 0;
   const MAX_PLAYERS = 100;
@@ -182,7 +185,7 @@ function App() {
     }
   };
 
-  const loadThisGame = (gameState: GameState) => {
+  const loadThisGame = (gameState: GameState, updateIsChanged = true) => {
     setPropositions(gameState.propositions);
     setPlayerStates(
       gameState.players.map((player) => ({
@@ -190,7 +193,9 @@ function App() {
         validatedItems: new Map(player.validatedItems),
       }))
     );
-    setIsChanged(true);
+    if (updateIsChanged) {
+      setIsChanged(true);
+    }
   };
 
   const loadGame = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -219,6 +224,34 @@ function App() {
 
   useEffect(() => {
     loadLastGame();
+    const { hostname, origin } = window.location;
+    const socket = io(
+      hostname === "localhost"
+        ? "http://localhost:3200/save"
+        : origin + "/save",
+      {
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+      }
+    );
+
+    socket.on("connected", (c) => {
+      setPlayerOnline(c.connectedUsers);
+    });
+
+    socket.on("new-changes", (newChanges: { data: GameState }) => {
+      console.log("new-changes", newChanges);
+      const updateIsChanged = false;
+      loadThisGame(newChanges.data, updateIsChanged);
+    });
+
+    socket.on("users-updated", (c) => {
+      setPlayerOnline(c.connectedUsers);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   return (
@@ -276,6 +309,11 @@ function App() {
               </>
             )}
             <SeePreviousHistory loadThisGame={loadThisGame} />
+            <Tooltip content="Utilisateurs sur le site">
+              <div className="flex flex-row items-center gap-1 text-sm cursor-pointer">
+                <User size={16} /> {playerOnline}
+              </div>
+            </Tooltip>
             {/* <button
               onClick={loadLastGame}
               disabled={!isChanged}
