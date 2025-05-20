@@ -20,6 +20,8 @@ function App() {
   const ITEMS_PER_GRID = 6;
   const MIN_PLAYERS = 0;
   const MAX_PLAYERS = 100;
+  const params = new URLSearchParams(window.location.search);
+  const showAllButtons = params.get("showAllButtons");
 
   const generateNewGrids = (playerCount: number = playerStates.length || 6) => {
     const grids = generateGrids(propositions, playerCount, ITEMS_PER_GRID);
@@ -252,23 +254,27 @@ function App() {
               <Save size={16} />
               Sauvegarder
             </button>
-            {/* <button
-              onClick={downloadGame}
-              className="flex items-center text-sm gap-2 bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              <Download size={16} />
-              Télécharger
-            </button>
-            <label className="flex items-center text-sm gap-2 bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 transition-colors cursor-pointer">
-              <Upload size={16} />
-              Upload
-              <input
-                type="file"
-                accept=".json"
-                onChange={loadGame}
-                className="hidden"
-              />
-            </label> */}
+            {showAllButtons && (
+              <>
+                <button
+                  onClick={downloadGame}
+                  className="flex items-center text-sm gap-2 bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  <Download size={16} />
+                  Télécharger
+                </button>
+                <label className="flex items-center text-sm gap-2 bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 transition-colors cursor-pointer">
+                  <Upload size={16} />
+                  Upload
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={loadGame}
+                    className="hidden"
+                  />
+                </label>
+              </>
+            )}
             <SeePreviousHistory loadThisGame={loadThisGame} />
             {/* <button
               onClick={loadLastGame}

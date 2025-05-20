@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Proposition, ValidatedItem } from "../types";
 import { Check, Edit2, XIcon } from "lucide-react";
 import { Modal } from "./Modal";
+import { shortDateFormat } from "../services/utils";
 
 interface BingoGridProps {
   items: string[];
@@ -121,6 +122,13 @@ export const BingoGrid = ({
                   <>
                     <div className="mt-2 leading-none text-[12px] italic">
                       {validatedItem?.description}
+                    </div>
+                    <div className="text-[8px] italic opacity-50 flex flex-row items-center justify-center mt-2">
+                      <Check className="text-green-500 mr-1" size={12} />
+                      {new Date(validatedItem?.timestamp).toLocaleString(
+                        "fr-FR",
+                        shortDateFormat
+                      )}
                     </div>
                     <button
                       onClick={(e) => {

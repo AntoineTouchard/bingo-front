@@ -2,10 +2,10 @@ import { XIcon } from "lucide-react";
 import { useState } from "react";
 import { Proposition } from "../types";
 
-export const PropositionManager = ({ 
+export const PropositionManager = ({
   propositions,
   onAddProposition,
-  onRemoveProposition 
+  onRemoveProposition,
 }: {
   propositions: Proposition[];
   onAddProposition: (text: string) => void;
@@ -23,7 +23,9 @@ export const PropositionManager = ({
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-      <h2 className="text-xl font-bold text-indigo-600 mb-4">Gérer les propositions</h2>
+      <h2 className="text-xl font-bold text-indigo-600 mb-4">
+        Gérer les propositions
+      </h2>
       <form onSubmit={handleSubmit} className="flex gap-2 mb-4">
         <input
           type="text"
@@ -42,11 +44,14 @@ export const PropositionManager = ({
       </form>
       <div className="max-h-40 overflow-y-auto">
         {propositions.map((prop) => (
-          <div key={prop.id} className="flex justify-between items-center py-2 border-b">
+          <div
+            key={prop.id}
+            className="flex justify-between items-center py-2 border-b"
+          >
             <span>{prop.text}</span>
             <button
               onClick={() => onRemoveProposition(prop.id)}
-              className="p-1 hover:bg-red-50 rounded-full"
+              className="p-1 hover:bg-red-50 rounded-full mr-2"
             >
               <XIcon size={16} className="text-red-500" />
             </button>
@@ -55,4 +60,4 @@ export const PropositionManager = ({
       </div>
     </div>
   );
-}
+};
