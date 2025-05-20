@@ -96,7 +96,7 @@ export const SeePreviousHistory = ({
                                         {item.description}
                                       </div>
 
-                                      <div className="text-[8px] italic opacity-70 flex flex-row items-center">
+                                      <div className="text-[12px] italic opacity-70 flex flex-row items-center">
                                         {new Date(
                                           item.timestamp
                                         ).toLocaleString(

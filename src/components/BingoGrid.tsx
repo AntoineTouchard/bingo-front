@@ -123,7 +123,7 @@ export const BingoGrid = ({
                     <div className="mt-2 leading-none text-[12px] italic">
                       {validatedItem?.description}
                     </div>
-                    <div className="text-[8px] italic opacity-50 flex flex-row items-center justify-center mt-2 leading-3">
+                    <div className="text-[12px] italic opacity-80 flex flex-row items-center justify-center mt-2 leading-3">
                       <Check className="text-green-500 mr-1" size={12} />
                       {new Date(validatedItem?.timestamp).toLocaleString(
                         "fr-FR",

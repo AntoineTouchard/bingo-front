@@ -13,7 +13,7 @@ export const Tooltip = ({
   content,
   children,
   side = "top",
-  delayDuration = 200,
+  delayDuration = 0,
 }: TooltipProps) => {
   return (
     <RadixTooltip.Provider delayDuration={delayDuration}>
