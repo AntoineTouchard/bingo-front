@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Proposition, ValidatedItem } from "../types";
 import { Check, Edit2, XIcon, Trophy, Target } from "lucide-react";
 import { Modal } from "./Modal";
+import { Tooltip } from "./Tooltip";
 import { shortDateFormat } from "../services/utils";
 
 interface BingoGridProps {
@@ -123,6 +124,9 @@ export const BingoGrid = ({
     const validatedItem = validatedItems.get(index);
     const propositionText = getPropositionById(itemId);
 
+    // Fonction pour déterminer si le texte est trop long
+    const isTextLong = (text: string) => text.length > 50;
+
     return (
       <div key={index} className="relative group">
         <div
@@ -147,11 +151,32 @@ export const BingoGrid = ({
           
           {isValidated && (
             <>
-              {/* Description - prend l'espace disponible */}
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-xs italic opacity-90 leading-tight text-center overflow-hidden">
-                  {validatedItem?.description}
-                </div>
+              {/* Description - avec tooltip si trop longue */}
+              <div className="flex-1 flex items-center justify-center min-h-0">
+                {isTextLong(validatedItem?.description || "") ? (
+                  <Tooltip
+                    content={
+                      <div className="max-w-xs">
+                        <div className="font-semibold mb-2 text-white">Description complète :</div>
+                        <div className="text-sm leading-relaxed">{validatedItem?.description}</div>
+                      </div>
+                    }
+                    side="top"
+                  >
+                    <div className="text-xs italic opacity-90 leading-tight text-center overflow-hidden cursor-help hover:opacity-100 transition-opacity duration-200">
+                      <div className="max-h-16 overflow-y-auto scrollbar-thin scrollbar-thumb-success-300 scrollbar-track-transparent">
+                        {validatedItem?.description}
+                      </div>
+                      <div className="text-xs mt-1 opacity-70">
+                        ℹ️ Survolez pour voir le texte complet
+                      </div>
+                    </div>
+                  </Tooltip>
+                ) : (
+                  <div className="text-xs italic opacity-90 leading-tight text-center overflow-hidden">
+                    {validatedItem?.description}
+                  </div>
+                )}
               </div>
               
               {/* Date - fixée en bas */}
