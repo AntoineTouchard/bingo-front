@@ -1,5 +1,5 @@
 import React from "react";
-import { Shuffle, Plus, Save, Upload, Download, User } from "lucide-react";
+import { Shuffle, Plus, Upload, Download, User, CheckCircle } from "lucide-react";
 import { SeePreviousHistory } from "./SeePreviousHistory";
 import { Tooltip } from "./Tooltip";
 import { GameState } from "../types";
@@ -12,7 +12,6 @@ interface GameHeaderProps {
   showAllButtons?: boolean;
   onAddPlayer: () => void;
   onGenerateNewGrids: () => void;
-  onSaveGame: () => void;
   onDownloadGame: () => void;
   onLoadGame: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onLoadThisGame: (gameState: GameState) => void;
@@ -26,7 +25,6 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
   showAllButtons,
   onAddPlayer,
   onGenerateNewGrids,
-  onSaveGame,
   onDownloadGame,
   onLoadGame,
   onLoadThisGame,
@@ -50,18 +48,15 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
           <Shuffle size={16} />
           Nouvelles grilles
         </button>
-        <button
-          onClick={onSaveGame}
-          disabled={!isChanged}
-          style={{
-            opacity: isChanged ? 1 : 0.5,
-            pointerEvents: isChanged ? "auto" : "none",
-          }}
-          className="flex items-center text-sm gap-2 bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
-        >
-          <Save size={16} />
-          Sauvegarder
-        </button>
+        
+        {/* Indicateur de sauvegarde automatique */}
+        <Tooltip content="Sauvegarde automatique activée">
+          <div className="flex items-center text-sm gap-2 bg-green-100 text-green-700 px-3 py-2 rounded-lg border border-green-200">
+            <CheckCircle size={16} />
+            Auto-save
+          </div>
+        </Tooltip>
+
         {showAllButtons && (
           <>
             <button
