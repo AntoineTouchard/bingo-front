@@ -22,8 +22,10 @@ export const Tooltip = ({
         <RadixTooltip.Portal>
           <RadixTooltip.Content
             side={side}
-            className="bg-gray-800 text-white text-xs px-3 py-2 rounded shadow z-50 max-w-xs"
+            className="bg-gray-800 text-white text-xs px-3 py-2 rounded shadow z-50 max-w-xs break-words"
             sideOffset={5}
+            collisionPadding={10}
+            avoidCollisions={true}
           >
             {content}
             <RadixTooltip.Arrow className="fill-gray-800" />
