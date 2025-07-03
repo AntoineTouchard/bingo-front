@@ -2,21 +2,31 @@ import { useEffect, useState } from "react";
 import { Modal } from "./Modal";
 import { fetchSaves } from "../services/Api.service";
 import { GameState, SavesResponse } from "../types";
-import { Check, List, X, Calendar, Users, FileText, Trophy } from "lucide-react";
+import { Check, List, X, Calendar, Users, FileText, Trophy, AlertTriangle } from "lucide-react";
 import { Tooltip } from "./Tooltip";
 import { datetimeFormat } from "../services/utils";
 
 export const SeePreviousHistory = ({
   loadThisGame,
+  disabled = false,
 }: {
   loadThisGame: (data: GameState) => void;
+  disabled?: boolean;
 }) => {
   const [isOpened, setIsOpened] = useState(false);
   const [saves, setSaves] = useState<SavesResponse[]>([]);
 
   const handleLoadGame = (data: GameState) => {
-    loadThisGame(data);
-    setIsOpened(false);
+    if (!disabled) {
+      loadThisGame(data);
+      setIsOpened(false);
+    }
+  };
+
+  const handleOpenModal = () => {
+    if (!disabled) {
+      setIsOpened(true);
+    }
   };
   
   useEffect(() => {
@@ -45,13 +55,20 @@ export const SeePreviousHistory = ({
 
   return (
     <div>
-      <button
-        onClick={() => setIsOpened(true)}
-        className="flex items-center gap-2 bg-gradient-to-r from-secondary-500 to-secondary-600 text-white px-4 py-2.5 rounded-xl hover:from-secondary-600 hover:to-secondary-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
-      >
-        <List size={18} />
-        Historique
-      </button>
+      <Tooltip content={disabled ? "Sauvegardez ou annulez vos modifications avant d'accéder à l'historique" : ""}>
+        <button
+          onClick={handleOpenModal}
+          disabled={disabled}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 shadow-soft hover:shadow-medium font-medium ${
+            disabled
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-gradient-to-r from-secondary-500 to-secondary-600 text-white hover:from-secondary-600 hover:to-secondary-700"
+          }`}
+        >
+          {disabled ? <AlertTriangle size={18} /> : <List size={18} />}
+          Historique
+        </button>
+      </Tooltip>
       
       <Modal isOpen={isOpened} onClose={() => setIsOpened(false)}>
         <div className="space-y-6 max-h-[80vh]">
@@ -183,7 +200,12 @@ export const SeePreviousHistory = ({
                       
                       <button
                         onClick={() => handleLoadGame(save.data)}
-                        className="px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-soft text-sm font-medium"
+                        disabled={disabled}
+                        className={`px-4 py-2 rounded-lg transition-all duration-200 shadow-soft text-sm font-medium ${
+                          disabled
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700"
+                        }`}
                       >
                         Charger
                       </button>

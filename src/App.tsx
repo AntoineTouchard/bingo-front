@@ -3,7 +3,6 @@ import { initialPropositions } from "./types";
 import { useGameState } from "./hooks/useGameState";
 import { useGamePersistence } from "./hooks/useGamePersistence";
 import { useSocket } from "./hooks/useSocket";
-import { PropositionManager } from "./components/PropositionManager";
 import { GameHeader } from "./components/GameHeader";
 import { PlayerGrid } from "./components/PlayerGrid";
 
@@ -47,6 +46,7 @@ function App() {
     playerStates,
     isChanged,
     isLoadedGame,
+    hasUnsavedChanges,
     setIsChanged,
     setIsLoadedGame,
     generateNewGrids,
@@ -58,6 +58,7 @@ function App() {
     addProposition,
     removeProposition,
     loadGameState,
+    confirmUnsavedChanges,
   } = gameState;
 
   const handleNewChanges = (data: any) => {
@@ -126,6 +127,12 @@ function App() {
     }
   };
 
+  const handleCancelChanges = () => {
+    if (confirmUnsavedChanges()) {
+      handleLoadLastGame();
+    }
+  };
+
   useEffect(() => {
     handleLoadLastGame();
   }, []);
@@ -138,6 +145,7 @@ function App() {
           maxPlayers={MAX_PLAYERS}
           isChanged={isChanged}
           isLoadedGame={isLoadedGame}
+          hasUnsavedChanges={hasUnsavedChanges}
           playerOnline={playerOnline}
           showAllButtons={!!showAllButtons}
           propositions={propositions}
@@ -149,12 +157,14 @@ function App() {
           onLoadThisGame={loadGameState}
           onAddProposition={addProposition}
           onRemoveProposition={removeProposition}
+          onCancelChanges={handleCancelChanges}
         />
 
         <PlayerGrid
           playerStates={playerStates}
           propositions={propositions}
           minPlayers={MIN_PLAYERS}
+          hasUnsavedChanges={hasUnsavedChanges}
           onUpdatePlayerName={updatePlayerName}
           onRemovePlayer={removePlayer}
           onValidateItem={validateItem}

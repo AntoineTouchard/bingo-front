@@ -1,40 +1,60 @@
-import { XIcon, Plus, Lightbulb, Settings } from "lucide-react";
+import { XIcon, Plus, Lightbulb, Settings, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { Proposition } from "../types";
 import { Modal } from "./Modal";
+import { Tooltip } from "./Tooltip";
 
 export const PropositionManager = ({
   propositions,
   onAddProposition,
   onRemoveProposition,
+  disabled = false,
 }: {
   propositions: Proposition[];
   onAddProposition: (text: string) => void;
   onRemoveProposition: (id: string) => void;
+  disabled?: boolean;
 }) => {
   const [newProposition, setNewProposition] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newProposition.trim()) {
+    if (newProposition.trim() && !disabled) {
       onAddProposition(newProposition.trim());
       setNewProposition("");
     }
   };
 
+  const handleOpenModal = () => {
+    if (!disabled) {
+      setIsModalOpen(true);
+    }
+  };
+
   return (
     <>
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="flex items-center gap-2 bg-gradient-to-r from-warning-500 to-warning-600 text-white px-4 py-2.5 rounded-xl hover:from-warning-600 hover:to-warning-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
-      >
-        <Settings size={18} />
-        Gérer les propositions
-        <div className="ml-1 bg-warning-400 text-warning-800 px-2 py-0.5 rounded-full text-xs font-bold">
-          {propositions.length}
-        </div>
-      </button>
+      <Tooltip content={disabled ? "Sauvegardez ou annulez vos modifications avant de gérer les propositions" : ""}>
+        <button
+          onClick={handleOpenModal}
+          disabled={disabled}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 shadow-soft hover:shadow-medium font-medium ${
+            disabled
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-gradient-to-r from-warning-500 to-warning-600 text-white hover:from-warning-600 hover:to-warning-700"
+          }`}
+        >
+          {disabled ? <AlertTriangle size={18} /> : <Settings size={18} />}
+          Gérer les propositions
+          <div className={`ml-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+            disabled
+              ? "bg-gray-200 text-gray-500"
+              : "bg-warning-400 text-warning-800"
+          }`}>
+            {propositions.length}
+          </div>
+        </button>
+      </Tooltip>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className="flex flex-col h-full max-h-[80vh]">

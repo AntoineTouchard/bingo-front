@@ -6,6 +6,7 @@ interface PlayerGridProps {
   playerStates: PlayerState[];
   propositions: Proposition[];
   minPlayers: number;
+  hasUnsavedChanges?: boolean;
   onUpdatePlayerName: (index: number, newName: string) => void;
   onRemovePlayer: (index: number) => void;
   onValidateItem: (playerIndex: number, itemIndex: number, description: string) => void;
@@ -16,6 +17,7 @@ export const PlayerGrid: React.FC<PlayerGridProps> = ({
   playerStates,
   propositions,
   minPlayers,
+  hasUnsavedChanges = false,
   onUpdatePlayerName,
   onRemovePlayer,
   onValidateItem,
@@ -109,6 +111,7 @@ export const PlayerGrid: React.FC<PlayerGridProps> = ({
                 onRemoveValidation={(itemIndex) =>
                   onRemoveValidation(originalIndex, itemIndex)
                 }
+                hasUnsavedChanges={hasUnsavedChanges}
               />
             </div>
           </div>
