@@ -1,5 +1,5 @@
 import React from "react";
-import { Shuffle, Plus, Save, Upload, Download, User, Gamepad2, Zap } from "lucide-react";
+import { Shuffle, Plus, Save, Upload, Download, User, Gamepad2 } from "lucide-react";
 import { SeePreviousHistory } from "./SeePreviousHistory";
 import { PropositionManager } from "./PropositionManager";
 import { Tooltip } from "./Tooltip";
@@ -57,13 +57,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
                 Bingo Anytime
               </h1>
-              <div className="flex items-center gap-2">
-                <p className="text-gray-500 text-sm">Créez et jouez en temps réel</p>
-                <div className="flex items-center gap-1 bg-success-100 text-success-700 px-2 py-1 rounded-full text-xs font-medium">
-                  <Zap size={12} />
-                  Sauvegarde auto
-                </div>
-              </div>
+              <p className="text-gray-500 text-sm">Créez et jouez en temps réel</p>
             </div>
           </div>
           
