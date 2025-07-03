@@ -19,10 +19,10 @@ export const Modal = ({
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-2xl shadow-strong max-w-lg w-full mx-4 animate-slide-up"
+        className="bg-white rounded-2xl shadow-strong w-full max-w-lg max-h-[90vh] overflow-hidden animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6">
+        <div className="p-6 max-h-[90vh] overflow-y-auto">
           {children}
         </div>
       </div>
