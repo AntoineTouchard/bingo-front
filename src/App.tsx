@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { initialPropositions } from "./types";
 import { useGameState } from "./hooks/useGameState";
 import { useGamePersistence } from "./hooks/useGamePersistence";
@@ -61,9 +61,10 @@ function App() {
     confirmUnsavedChanges,
   } = gameState;
 
-  const handleNewChanges = (data: any) => {
+  // Stabiliser la fonction handleNewChanges avec useCallback
+  const handleNewChanges = useCallback((data: any) => {
     loadGameState(data, false);
-  };
+  }, [loadGameState]);
 
   const { playerOnline } = useSocket(handleNewChanges);
 
