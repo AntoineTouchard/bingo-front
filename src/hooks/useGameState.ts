@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { GameState, PlayerState, Proposition } from '../types';
 import { generateGrid, generateGrids } from '../services/utils';
 
@@ -6,9 +6,11 @@ interface UseGameStateReturn {
   propositions: Proposition[];
   playerStates: PlayerState[];
   isChanged: boolean;
+  isLoadedGame: boolean;
   setPropositions: (propositions: Proposition[]) => void;
   setPlayerStates: (playerStates: PlayerState[]) => void;
   setIsChanged: (changed: boolean) => void;
+  setIsLoadedGame: (loaded: boolean) => void;
   generateNewGrids: (playerCount?: number) => void;
   addPlayer: () => void;
   removePlayer: (index: number) => void;
@@ -24,11 +26,24 @@ export const useGameState = (
   initialPropositions: Proposition[],
   itemsPerGrid: number = 6,
   minPlayers: number = 0,
-  maxPlayers: number = 100
+  maxPlayers: number = 100,
+  onAutoSave?: () => void
 ): UseGameStateReturn => {
   const [propositions, setPropositions] = useState<Proposition[]>(initialPropositions);
   const [playerStates, setPlayerStates] = useState<PlayerState[]>([]);
   const [isChanged, setIsChanged] = useState<boolean>(false);
+  const [isLoadedGame, setIsLoadedGame] = useState<boolean>(false);
+
+  // Auto-save effect
+  useEffect(() => {
+    if (isChanged && !isLoadedGame && onAutoSave) {
+      const timeoutId = setTimeout(() => {
+        onAutoSave();
+      }, 1000); // Délai de 1 seconde pour éviter trop de sauvegardes
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isChanged, isLoadedGame, onAutoSave]);
 
   const generateNewGrids = useCallback((playerCount: number = playerStates.length || 6) => {
     const grids = generateGrids(propositions, playerCount, itemsPerGrid);
@@ -43,6 +58,7 @@ export const useGameState = (
       return newStates;
     });
     setIsChanged(true);
+    setIsLoadedGame(false);
   }, [propositions, playerStates.length, itemsPerGrid]);
 
   const addPlayer = useCallback(() => {
@@ -133,15 +149,18 @@ export const useGameState = (
     if (updateIsChanged) {
       setIsChanged(true);
     }
+    setIsLoadedGame(true);
   }, []);
 
   return {
     propositions,
     playerStates,
     isChanged,
+    isLoadedGame,
     setPropositions,
     setPlayerStates,
     setIsChanged,
+    setIsLoadedGame,
     generateNewGrids,
     addPlayer,
     removePlayer,

@@ -1,38 +1,29 @@
 import { useCallback } from 'react';
 import { fetchLastSave, saveJson } from '../services/Api.service';
-import { GameState, PlayerState, Proposition } from '../types';
+import { GameState } from '../types';
 
 interface UseGamePersistenceReturn {
-  saveGame: () => Promise<void>;
-  downloadGame: () => Promise<void>;
+  saveGame: (gameState: GameState) => Promise<void>;
+  downloadGame: (gameState: GameState) => Promise<void>;
   loadLastGame: () => Promise<GameState | null>;
   loadGameFromFile: (file: File) => Promise<GameState | null>;
 }
 
 export const useGamePersistence = (
-  propositions: Proposition[],
-  playerStates: PlayerState[]
+  propositions: any[],
+  playerStates: any[]
 ): UseGamePersistenceReturn => {
-  const createGameState = useCallback((): GameState => ({
-    players: playerStates.map((playerState) => ({
-      ...playerState,
-      validatedItems: Array.from(playerState.validatedItems.entries()),
-    })),
-    propositions,
-  }), [propositions, playerStates]);
 
-  const saveGame = useCallback(async () => {
-    const gameState = createGameState();
+  const saveGame = useCallback(async (gameState: GameState) => {
     try {
       await saveJson(gameState);
     } catch (error) {
       console.error("Error saving game:", error);
       throw new Error("Erreur lors de la sauvegarde du fichier source");
     }
-  }, [createGameState]);
+  }, []);
 
-  const downloadGame = useCallback(async () => {
-    const gameState = createGameState();
+  const downloadGame = useCallback(async (gameState: GameState) => {
     try {
       const blob = new Blob([JSON.stringify(gameState, null, 2)], {
         type: "application/json",
@@ -49,7 +40,7 @@ export const useGamePersistence = (
       console.error("Error downloading game:", error);
       throw new Error("Erreur lors du téléchargement du fichier");
     }
-  }, [createGameState]);
+  }, []);
 
   const loadLastGame = useCallback(async (): Promise<GameState | null> => {
     try {

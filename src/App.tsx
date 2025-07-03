@@ -14,12 +14,41 @@ function App() {
   const params = new URLSearchParams(window.location.search);
   const showAllButtons = params.get("showAllButtons");
 
-  const gameState = useGameState(initialPropositions, ITEMS_PER_GRID, MIN_PLAYERS, MAX_PLAYERS);
+  const persistence = useGamePersistence([], []);
+  const { saveGame, downloadGame, loadLastGame, loadGameFromFile } = persistence;
+
+  // Auto-save function
+  const handleAutoSave = async () => {
+    try {
+      const gameStateData = {
+        players: playerStates.map((playerState) => ({
+          ...playerState,
+          validatedItems: Array.from(playerState.validatedItems.entries()),
+        })),
+        propositions,
+      };
+      await saveGame(gameStateData);
+      setIsChanged(false);
+    } catch (error) {
+      console.error("Auto-save failed:", error);
+    }
+  };
+
+  const gameState = useGameState(
+    initialPropositions, 
+    ITEMS_PER_GRID, 
+    MIN_PLAYERS, 
+    MAX_PLAYERS,
+    handleAutoSave
+  );
+  
   const {
     propositions,
     playerStates,
     isChanged,
+    isLoadedGame,
     setIsChanged,
+    setIsLoadedGame,
     generateNewGrids,
     addPlayer,
     removePlayer,
@@ -31,9 +60,6 @@ function App() {
     loadGameState,
   } = gameState;
 
-  const persistence = useGamePersistence(propositions, playerStates);
-  const { saveGame, downloadGame, loadLastGame, loadGameFromFile } = persistence;
-
   const handleNewChanges = (data: any) => {
     loadGameState(data, false);
   };
@@ -42,8 +68,16 @@ function App() {
 
   const handleSaveGame = async () => {
     try {
-      await saveGame();
+      const gameStateData = {
+        players: playerStates.map((playerState) => ({
+          ...playerState,
+          validatedItems: Array.from(playerState.validatedItems.entries()),
+        })),
+        propositions,
+      };
+      await saveGame(gameStateData);
       setIsChanged(false);
+      setIsLoadedGame(false);
     } catch (error) {
       alert(error instanceof Error ? error.message : "Erreur lors de la sauvegarde");
     }
@@ -51,7 +85,14 @@ function App() {
 
   const handleDownloadGame = async () => {
     try {
-      await downloadGame();
+      const gameStateData = {
+        players: playerStates.map((playerState) => ({
+          ...playerState,
+          validatedItems: Array.from(playerState.validatedItems.entries()),
+        })),
+        propositions,
+      };
+      await downloadGame(gameStateData);
     } catch (error) {
       alert(error instanceof Error ? error.message : "Erreur lors du téléchargement");
     }
@@ -77,11 +118,10 @@ function App() {
       if (lastGameState) {
         loadGameState(lastGameState, false);
       } else {
-        alert("Aucune sauvegarde trouvée");
         generateNewGrids();
       }
     } catch (error) {
-      alert("Erreur lors du chargement : " + error);
+      console.error("Erreur lors du chargement :", error);
       generateNewGrids();
     }
   };
@@ -97,6 +137,7 @@ function App() {
           playerCount={playerStates.length}
           maxPlayers={MAX_PLAYERS}
           isChanged={isChanged}
+          isLoadedGame={isLoadedGame}
           playerOnline={playerOnline}
           showAllButtons={!!showAllButtons}
           onAddPlayer={addPlayer}

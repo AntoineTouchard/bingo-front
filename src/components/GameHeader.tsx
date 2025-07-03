@@ -1,5 +1,5 @@
 import React from "react";
-import { Shuffle, Plus, Save, Upload, Download, User, Gamepad2 } from "lucide-react";
+import { Shuffle, Plus, Save, Upload, Download, User, Gamepad2, Zap } from "lucide-react";
 import { SeePreviousHistory } from "./SeePreviousHistory";
 import { Tooltip } from "./Tooltip";
 import { GameState } from "../types";
@@ -8,6 +8,7 @@ interface GameHeaderProps {
   playerCount: number;
   maxPlayers: number;
   isChanged: boolean;
+  isLoadedGame: boolean;
   playerOnline?: number;
   showAllButtons?: boolean;
   onAddPlayer: () => void;
@@ -22,6 +23,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
   playerCount,
   maxPlayers,
   isChanged,
+  isLoadedGame,
   playerOnline,
   showAllButtons,
   onAddPlayer,
@@ -42,7 +44,15 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
               Bingo Anytime
             </h1>
-            <p className="text-gray-500 text-sm">Créez et jouez en temps réel</p>
+            <div className="flex items-center gap-2">
+              <p className="text-gray-500 text-sm">Créez et jouez en temps réel</p>
+              {!isLoadedGame && (
+                <div className="flex items-center gap-1 bg-success-100 text-success-700 px-2 py-1 rounded-full text-xs font-medium">
+                  <Zap size={12} />
+                  Sauvegarde auto
+                </div>
+              )}
+            </div>
           </div>
         </div>
         
@@ -64,18 +74,21 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
             Nouvelles grilles
           </button>
           
-          <button
-            onClick={onSaveGame}
-            disabled={!isChanged}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 font-medium ${
-              isChanged
-                ? "bg-gradient-to-r from-warning-500 to-warning-600 text-white hover:from-warning-600 hover:to-warning-700 shadow-soft hover:shadow-medium"
-                : "bg-gray-100 text-gray-400 cursor-not-allowed"
-            }`}
-          >
-            <Save size={18} />
-            Sauvegarder
-          </button>
+          {/* Afficher le bouton sauvegarder seulement si c'est une partie chargée */}
+          {isLoadedGame && (
+            <button
+              onClick={onSaveGame}
+              disabled={!isChanged}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 font-medium ${
+                isChanged
+                  ? "bg-gradient-to-r from-warning-500 to-warning-600 text-white hover:from-warning-600 hover:to-warning-700 shadow-soft hover:shadow-medium"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              }`}
+            >
+              <Save size={18} />
+              Sauvegarder
+            </button>
+          )}
           
           {showAllButtons && (
             <>
