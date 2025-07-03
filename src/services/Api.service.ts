@@ -5,7 +5,7 @@ import { SaveResponse, SavesResponse } from '../types';
 const { hostname, origin } = window.location;
 
 const api: AxiosInstance = axios.create({
-  baseURL: hostname === 'localhost' ? 'http://localhost:3200/api' : origin+"/api",
+  baseURL: hostname === 'localhost' ? 'http://localhost:3200/api' : "https://quizzo.bitbase.fr/api",
   headers: {
     'Content-Type': 'application/json',
   },
