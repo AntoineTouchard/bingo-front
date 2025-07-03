@@ -28,6 +28,8 @@ function App() {
       };
       await saveGame(gameStateData);
       setIsChanged(false); // Marquer comme sauvegardé après la sauvegarde automatique
+      setIsLoadedGame(false); // Après sauvegarde automatique, ce n'est plus une partie chargée
+      setHasUnsavedChanges(false); // Plus de changements non sauvegardés
     } catch (error) {
       console.error("Auto-save failed:", error);
     }
@@ -49,6 +51,7 @@ function App() {
     hasUnsavedChanges,
     setIsChanged,
     setIsLoadedGame,
+    setHasUnsavedChanges,
     generateNewGrids,
     addPlayer,
     removePlayer,
@@ -80,6 +83,7 @@ function App() {
       await saveGame(gameStateData);
       setIsChanged(false);
       setIsLoadedGame(false); // Après sauvegarde manuelle, ce n'est plus une partie chargée
+      setHasUnsavedChanges(false);
     } catch (error) {
       alert(error instanceof Error ? error.message : "Erreur lors de la sauvegarde");
     }

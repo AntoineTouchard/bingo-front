@@ -39,14 +39,12 @@ export const BingoGrid = ({
   const [description, setDescription] = useState("");
 
   const handleNameSubmit = () => {
-    if (!hasUnsavedChanges) {
-      onNameChange(editedName);
-      setIsEditing(false);
-    }
+    onNameChange(editedName);
+    setIsEditing(false);
   };
 
   const handleValidation = () => {
-    if (selectedItem && description.trim() && !hasUnsavedChanges) {
+    if (selectedItem && description.trim()) {
       onValidateItem(selectedItem.index, description.trim());
       setDescription("");
       setSelectedItem(null);
@@ -54,25 +52,19 @@ export const BingoGrid = ({
   };
 
   const handleRemoveValidation = (index: number) => {
-    if (!hasUnsavedChanges) {
-      onRemoveValidation(index);
-    }
+    onRemoveValidation(index);
   };
 
   const handleRemovePlayer = () => {
-    if (!hasUnsavedChanges) {
-      onRemove();
-    }
+    onRemove();
   };
 
   const handleEditClick = () => {
-    if (!hasUnsavedChanges) {
-      setIsEditing(true);
-    }
+    setIsEditing(true);
   };
 
   const handleItemClick = (index: number, propositionText: string) => {
-    if (!hasUnsavedChanges && !validatedItems.has(index)) {
+    if (!validatedItems.has(index)) {
       setSelectedItem({ index, text: propositionText });
     }
   };
@@ -99,12 +91,7 @@ export const BingoGrid = ({
             />
             <button
               onClick={handleNameSubmit}
-              disabled={hasUnsavedChanges}
-              className={`p-2 rounded-full transition-colors duration-200 ${
-                hasUnsavedChanges
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "hover:bg-primary-100 text-primary-600"
-              }`}
+              className="p-2 rounded-full transition-colors duration-200 hover:bg-primary-100 text-primary-600"
             >
               <Check size={18} />
             </button>
@@ -115,47 +102,21 @@ export const BingoGrid = ({
               <Target size={20} className="text-white" />
             </div>
             <h2 className="text-xl font-bold text-gray-800">{playerName}</h2>
-            {hasUnsavedChanges ? (
-              <Tooltip content="Sauvegardez ou annulez vos modifications avant de modifier le nom">
-                <button
-                  onClick={handleEditClick}
-                  disabled={hasUnsavedChanges}
-                  className="p-2 rounded-full bg-gray-100 text-gray-400 cursor-not-allowed transition-colors duration-200"
-                >
-                  <AlertTriangle size={16} />
-                </button>
-              </Tooltip>
-            ) : (
-              <button
-                onClick={handleEditClick}
-                className="p-2 rounded-full hover:bg-gray-100 text-gray-400 transition-colors duration-200"
-              >
-                <Edit2 size={16} />
-              </button>
-            )}
+            <button
+              onClick={handleEditClick}
+              className="p-2 rounded-full hover:bg-gray-100 text-gray-400 transition-colors duration-200"
+            >
+              <Edit2 size={16} />
+            </button>
           </div>
         )}
         {isRemovable && (
-          <>
-            {hasUnsavedChanges ? (
-              <Tooltip content="Sauvegardez ou annulez vos modifications avant de supprimer le joueur">
-                <button
-                  onClick={handleRemovePlayer}
-                  disabled={hasUnsavedChanges}
-                  className="p-2 rounded-full bg-gray-100 text-gray-400 cursor-not-allowed transition-colors duration-200"
-                >
-                  <AlertTriangle size={18} />
-                </button>
-              </Tooltip>
-            ) : (
-              <button
-                onClick={handleRemovePlayer}
-                className="p-2 rounded-full hover:bg-error-100 text-error-500 transition-colors duration-200"
-              >
-                <XIcon size={18} />
-              </button>
-            )}
-          </>
+          <button
+            onClick={handleRemovePlayer}
+            className="p-2 rounded-full hover:bg-error-100 text-error-500 transition-colors duration-200"
+          >
+            <XIcon size={18} />
+          </button>
         )}
       </div>
       
@@ -197,9 +158,7 @@ export const BingoGrid = ({
         <div
           onClick={() => handleItemClick(index, propositionText)}
           className={`p-4 border-2 rounded-xl h-[160px] text-center transition-all duration-300 text-sm relative overflow-hidden ${
-            hasUnsavedChanges
-              ? "cursor-not-allowed opacity-75"
-              : isValidated
+            isValidated
               ? "bg-gradient-to-br from-success-500 to-success-600 text-white border-success-600 shadow-medium transform scale-105"
               : "border-gray-200 hover:border-primary-300 hover:bg-primary-50 hover:shadow-soft bg-white cursor-pointer"
           }`}
@@ -242,41 +201,20 @@ export const BingoGrid = ({
                   shortDateFormat
                 )}
               </div>
-              {hasUnsavedChanges ? (
-                <Tooltip content="Sauvegardez ou annulez vos modifications avant de dévalider">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveValidation(index);
-                    }}
-                    disabled={hasUnsavedChanges}
-                    className="absolute top-2 right-2 p-1 rounded-full bg-gray-400 text-gray-300 cursor-not-allowed opacity-50 transition-colors duration-200"
-                  >
-                    <AlertTriangle size={14} />
-                  </button>
-                </Tooltip>
-              ) : (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveValidation(index);
-                  }}
-                  className="absolute top-2 right-2 p-1 rounded-full hover:bg-success-600 opacity-0 group-hover:opacity-100 transition-colors duration-200"
-                >
-                  <XIcon size={14} />
-                </button>
-              )}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRemoveValidation(index);
+                }}
+                className="absolute top-2 right-2 p-1 rounded-full hover:bg-success-600 opacity-0 group-hover:opacity-100 transition-colors duration-200"
+              >
+                <XIcon size={14} />
+              </button>
             </>
           )}
           
-          {!isValidated && !hasUnsavedChanges && (
+          {!isValidated && (
             <div className="absolute inset-0 bg-gradient-to-br from-primary-500/0 to-secondary-500/0 group-hover:from-primary-500/5 group-hover:to-secondary-500/5 transition-all duration-300 rounded-xl"></div>
-          )}
-
-          {hasUnsavedChanges && (
-            <div className="absolute inset-0 bg-gray-500/20 flex items-center justify-center rounded-xl">
-              <AlertTriangle size={24} className="text-gray-400" />
-            </div>
           )}
         </div>
       </div>
@@ -284,9 +222,7 @@ export const BingoGrid = ({
   };
 
   return (
-    <div className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft p-6 hover:shadow-medium transition-all duration-300 animate-fade-in ${
-      hasUnsavedChanges ? "ring-2 ring-warning-200 ring-opacity-50" : ""
-    }`}>
+    <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft p-6 hover:shadow-medium transition-all duration-300 animate-fade-in">
       {renderPlayerHeader()}
       <div className="grid grid-cols-2 gap-4">
         {items.map((itemId, index) => renderGridItem(itemId, index))}
@@ -325,7 +261,7 @@ export const BingoGrid = ({
             </button>
             <button
               onClick={handleValidation}
-              disabled={!description.trim() || hasUnsavedChanges}
+              disabled={!description.trim()}
               className="flex-1 px-4 py-3 bg-gradient-to-r from-success-500 to-success-600 text-white rounded-xl hover:from-success-600 hover:to-success-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-soft"
             >
               Valider

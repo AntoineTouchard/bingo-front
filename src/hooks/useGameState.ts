@@ -37,16 +37,16 @@ export const useGameState = (
   const [isLoadedGame, setIsLoadedGame] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
 
-  // Auto-save effect - Seulement pour les nouvelles parties (pas les parties chargées)
+  // Auto-save effect - ACTIVÉ pour toutes les actions
   useEffect(() => {
-    if (isChanged && !isLoadedGame && onAutoSave) {
+    if (isChanged && onAutoSave) {
       const timeoutId = setTimeout(() => {
         onAutoSave();
       }, 1000); // Délai de 1 seconde pour éviter trop de sauvegardes
 
       return () => clearTimeout(timeoutId);
     }
-  }, [isChanged, isLoadedGame, onAutoSave]);
+  }, [isChanged, onAutoSave]);
 
   // Fonction pour confirmer les changements non sauvegardés
   const confirmUnsavedChanges = useCallback((): boolean => {
@@ -89,21 +89,15 @@ export const useGameState = (
         },
       ]);
       setIsChanged(true);
-      if (isLoadedGame) {
-        setHasUnsavedChanges(true);
-      }
     }
-  }, [playerStates.length, maxPlayers, propositions, itemsPerGrid, isLoadedGame]);
+  }, [playerStates.length, maxPlayers, propositions, itemsPerGrid]);
 
   const removePlayer = useCallback((index: number) => {
     if (playerStates.length > minPlayers) {
       setPlayerStates((prev) => prev.filter((_, i) => i !== index));
       setIsChanged(true);
-      if (isLoadedGame) {
-        setHasUnsavedChanges(true);
-      }
     }
-  }, [playerStates.length, minPlayers, isLoadedGame]);
+  }, [playerStates.length, minPlayers]);
 
   const updatePlayerName = useCallback((index: number, newName: string) => {
     setPlayerStates((prev) =>
@@ -112,10 +106,7 @@ export const useGameState = (
       )
     );
     setIsChanged(true);
-    if (isLoadedGame) {
-      setHasUnsavedChanges(true);
-    }
-  }, [isLoadedGame]);
+  }, []);
 
   const validateItem = useCallback((
     playerIndex: number,
@@ -137,10 +128,7 @@ export const useGameState = (
       })
     );
     setIsChanged(true);
-    if (isLoadedGame) {
-      setHasUnsavedChanges(true);
-    }
-  }, [isLoadedGame]);
+  }, []);
 
   const removeValidation = useCallback((playerIndex: number, itemIndex: number) => {
     setPlayerStates((prev) =>
@@ -154,26 +142,17 @@ export const useGameState = (
       })
     );
     setIsChanged(true);
-    if (isLoadedGame) {
-      setHasUnsavedChanges(true);
-    }
-  }, [isLoadedGame]);
+  }, []);
 
   const addProposition = useCallback((text: string) => {
     setPropositions((prev) => [...prev, { text, id: crypto.randomUUID() }]);
     setIsChanged(true);
-    if (isLoadedGame) {
-      setHasUnsavedChanges(true);
-    }
-  }, [isLoadedGame]);
+  }, []);
 
   const removeProposition = useCallback((id: string) => {
     setPropositions((prev) => prev.filter((p) => p.id !== id));
     setIsChanged(true);
-    if (isLoadedGame) {
-      setHasUnsavedChanges(true);
-    }
-  }, [isLoadedGame]);
+  }, []);
 
   const loadGameState = useCallback((gameState: GameState, updateIsChanged = true) => {
     if (hasUnsavedChanges && !confirmUnsavedChanges()) {
