@@ -1,5 +1,5 @@
 import React from "react";
-import { Shuffle, Plus, Save, Upload, Download, User, Gamepad2 } from "lucide-react";
+import { Shuffle, Plus, Upload, Download, User, Gamepad2 } from "lucide-react";
 import { SeePreviousHistory } from "./SeePreviousHistory";
 import { PropositionManager } from "./PropositionManager";
 import { Tooltip } from "./Tooltip";
@@ -28,21 +28,16 @@ interface GameHeaderProps {
 export const GameHeader: React.FC<GameHeaderProps> = ({
   playerCount,
   maxPlayers,
-  isChanged,
-  isLoadedGame,
-  hasUnsavedChanges,
   playerOnline,
   showAllButtons,
   propositions,
   onAddPlayer,
   onGenerateNewGrids,
-  onSaveGame,
   onDownloadGame,
   onLoadGame,
   onLoadThisGame,
   onAddProposition,
   onRemoveProposition,
-  onCancelChanges,
 }) => {
   return (
     <div className="space-y-4">
@@ -57,17 +52,19 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
                 Bingo Anytime
               </h1>
-              <p className="text-gray-500 text-sm">Créez et jouez en temps réel</p>
+              <p className="text-gray-500 text-sm pl-1 md:pl-3">
+                Qui remplira sa grille en premier ?
+              </p>
             </div>
           </div>
-          
+
           <div className="flex gap-3 flex-wrap justify-center lg:justify-end">
             <PropositionManager
               propositions={propositions}
               onAddProposition={onAddProposition}
               onRemoveProposition={onRemoveProposition}
             />
-            
+
             <button
               onClick={onAddPlayer}
               disabled={playerCount >= maxPlayers}
@@ -76,17 +73,17 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
               <Plus size={18} />
               Ajouter joueur
             </button>
-            
-            <button
-              onClick={onGenerateNewGrids}
-              className="flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2.5 rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
-            >
-              <Shuffle size={18} />
-              Nouvelles grilles
-            </button>
-            
+
             {showAllButtons && (
               <>
+                <button
+                  onClick={onGenerateNewGrids}
+                  className="flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2.5 rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
+                >
+                  <Shuffle size={18} />
+                  Nouvelles grilles
+                </button>
+
                 <button
                   onClick={onDownloadGame}
                   className="flex items-center gap-2 bg-gradient-to-r from-secondary-500 to-secondary-600 text-white px-4 py-2.5 rounded-xl hover:from-secondary-600 hover:to-secondary-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
@@ -94,7 +91,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
                   <Download size={18} />
                   Télécharger
                 </button>
-                
+
                 <label className="flex items-center gap-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-4 py-2.5 rounded-xl hover:from-primary-600 hover:to-secondary-600 transition-all duration-200 shadow-soft hover:shadow-medium cursor-pointer font-medium">
                   <Upload size={18} />
                   Charger
@@ -107,15 +104,15 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
                 </label>
               </>
             )}
-            
-            <SeePreviousHistory 
-              loadThisGame={onLoadThisGame}
-            />
-            
+
+            <SeePreviousHistory loadThisGame={onLoadThisGame} />
+
             <Tooltip content="Utilisateurs connectés">
               <div className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl font-medium">
                 <User size={18} className="text-primary-500" />
-                <span className="font-bold text-primary-600">{playerOnline}</span>
+                <span className="font-bold text-primary-600">
+                  {playerOnline}
+                </span>
               </div>
             </Tooltip>
           </div>

@@ -41,15 +41,16 @@ export const PropositionManager = ({
           {/* Header compact */}
           <div className="flex items-center justify-between mb-4 flex-shrink-0">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-br from-warning-400 to-warning-500 rounded-lg">
-                <Lightbulb size={18} className="text-white" />
+              <div className="p-3 bg-gradient-to-br from-warning-400 to-warning-500 rounded-lg">
+                <Lightbulb size={24} className="text-white" />
               </div>
-              <div>
+              <div className="flex flex-col items-start gap-1">
                 <h2 className="text-lg font-bold text-gray-800">
                   Propositions
                 </h2>
                 <div className="bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full text-xs font-medium">
-                  {propositions.length} élément{propositions.length > 1 ? "s" : ""}
+                  {propositions.length} élément
+                  {propositions.length > 1 ? "s" : ""}
                 </div>
               </div>
             </div>
@@ -60,9 +61,12 @@ export const PropositionManager = ({
               <XIcon size={18} className="text-gray-500" />
             </button>
           </div>
-          
+
           {/* Formulaire d'ajout */}
-          <form onSubmit={handleSubmit} className="flex gap-2 mb-4 flex-shrink-0">
+          <form
+            onSubmit={handleSubmit}
+            className="flex gap-2 mb-4 flex-shrink-0"
+          >
             <input
               type="text"
               value={newProposition}
@@ -80,19 +84,21 @@ export const PropositionManager = ({
               Ajouter
             </button>
           </form>
-          
+
           {/* Liste des propositions - zone scrollable */}
           <div className="flex-1 min-h-0">
             <h3 className="font-semibold text-gray-700 mb-3 text-sm">
               Liste actuelle
             </h3>
-            
-            <div className="h-full overflow-y-auto space-y-2 pr-2">
+
+            <div className="pb-6 h-full overflow-y-auto space-y-2 pr-2">
               {propositions.length === 0 ? (
                 <div className="text-center py-6 text-gray-500">
                   <Lightbulb size={32} className="mx-auto mb-3 text-gray-300" />
                   <p className="text-sm">Aucune proposition</p>
-                  <p className="text-xs text-gray-400">Ajoutez-en une pour commencer !</p>
+                  <p className="text-xs text-gray-400">
+                    Ajoutez-en une pour commencer !
+                  </p>
                 </div>
               ) : (
                 propositions.map((prop, index) => (
@@ -104,7 +110,9 @@ export const PropositionManager = ({
                       <div className="w-5 h-5 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                         {index + 1}
                       </div>
-                      <span className="text-gray-700 text-sm truncate">{prop.text}</span>
+                      <span className="text-gray-700 text-sm truncate">
+                        {prop.text}
+                      </span>
                     </div>
                     <button
                       onClick={() => onRemoveProposition(prop.id)}
@@ -116,16 +124,6 @@ export const PropositionManager = ({
                 ))
               )}
             </div>
-          </div>
-          
-          {/* Footer compact */}
-          <div className="flex justify-end pt-3 mt-4 border-t flex-shrink-0">
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-medium text-sm"
-            >
-              Fermer
-            </button>
           </div>
         </div>
       </Modal>
