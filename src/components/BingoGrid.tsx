@@ -130,14 +130,15 @@ export const BingoGrid = ({
             !isValidated &&
             setSelectedItem({ index, text: propositionText })
           }
-          className={`p-4 border-2 rounded-xl cursor-pointer h-[160px] text-center transition-all duration-300 text-sm relative overflow-hidden ${
+          className={`p-4 border-2 rounded-xl cursor-pointer h-[160px] text-center transition-all duration-300 text-sm relative overflow-hidden flex flex-col ${
             isValidated
               ? "bg-gradient-to-br from-success-500 to-success-600 text-white border-success-600 shadow-medium transform scale-105"
               : "border-gray-200 hover:border-primary-300 hover:bg-primary-50 hover:shadow-soft bg-white"
           }`}
         >
+          {/* Titre de la proposition */}
           <div
-            className={`text-sm font-bold leading-tight ${
+            className={`text-sm font-bold leading-tight mb-2 ${
               isValidated ? "text-white" : "text-gray-700"
             }`}
           >
@@ -146,16 +147,25 @@ export const BingoGrid = ({
           
           {isValidated && (
             <>
-              <div className="mt-3 text-xs italic opacity-90 leading-tight">
-                {validatedItem?.description}
+              {/* Description - prend l'espace disponible */}
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-xs italic opacity-90 leading-tight text-center overflow-hidden">
+                  {validatedItem?.description}
+                </div>
               </div>
-              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 text-xs italic opacity-80 flex items-center gap-1">
-                <Check size={12} className="text-success-200" />
-                {new Date(validatedItem?.timestamp).toLocaleString(
-                  "fr-FR",
-                  shortDateFormat
-                )}
+              
+              {/* Date - fixée en bas */}
+              <div className="mt-auto pt-2 text-xs italic opacity-80 flex items-center justify-center gap-1">
+                <Check size={12} className="text-success-200 flex-shrink-0" />
+                <span className="truncate">
+                  {new Date(validatedItem?.timestamp).toLocaleString(
+                    "fr-FR",
+                    shortDateFormat
+                  )}
+                </span>
               </div>
+              
+              {/* Bouton de suppression */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
