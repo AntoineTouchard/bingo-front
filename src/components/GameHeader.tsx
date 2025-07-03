@@ -1,8 +1,9 @@
 import React from "react";
 import { Shuffle, Plus, Save, Upload, Download, User, Gamepad2, Zap } from "lucide-react";
 import { SeePreviousHistory } from "./SeePreviousHistory";
+import { PropositionManager } from "./PropositionManager";
 import { Tooltip } from "./Tooltip";
-import { GameState } from "../types";
+import { GameState, Proposition } from "../types";
 
 interface GameHeaderProps {
   playerCount: number;
@@ -11,12 +12,15 @@ interface GameHeaderProps {
   isLoadedGame: boolean;
   playerOnline?: number;
   showAllButtons?: boolean;
+  propositions: Proposition[];
   onAddPlayer: () => void;
   onGenerateNewGrids: () => void;
   onSaveGame: () => void;
   onDownloadGame: () => void;
   onLoadGame: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onLoadThisGame: (gameState: GameState) => void;
+  onAddProposition: (text: string) => void;
+  onRemoveProposition: (id: string) => void;
 }
 
 export const GameHeader: React.FC<GameHeaderProps> = ({
@@ -26,12 +30,15 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
   isLoadedGame,
   playerOnline,
   showAllButtons,
+  propositions,
   onAddPlayer,
   onGenerateNewGrids,
   onSaveGame,
   onDownloadGame,
   onLoadGame,
   onLoadThisGame,
+  onAddProposition,
+  onRemoveProposition,
 }) => {
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft p-6 mb-8 animate-fade-in">
@@ -57,6 +64,12 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
         </div>
         
         <div className="flex gap-3 flex-wrap justify-center lg:justify-end">
+          <PropositionManager
+            propositions={propositions}
+            onAddProposition={onAddProposition}
+            onRemoveProposition={onRemoveProposition}
+          />
+          
           <button
             onClick={onAddPlayer}
             disabled={playerCount >= maxPlayers}

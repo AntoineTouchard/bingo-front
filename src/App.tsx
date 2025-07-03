@@ -140,16 +140,13 @@ function App() {
           isLoadedGame={isLoadedGame}
           playerOnline={playerOnline}
           showAllButtons={!!showAllButtons}
+          propositions={propositions}
           onAddPlayer={addPlayer}
           onGenerateNewGrids={() => generateNewGrids()}
           onSaveGame={handleSaveGame}
           onDownloadGame={handleDownloadGame}
           onLoadGame={handleLoadGame}
           onLoadThisGame={loadGameState}
-        />
-
-        <PropositionManager
-          propositions={propositions}
           onAddProposition={addProposition}
           onRemoveProposition={removeProposition}
         />
