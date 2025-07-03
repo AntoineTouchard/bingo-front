@@ -160,16 +160,19 @@ function App() {
           onCancelChanges={handleCancelChanges}
         />
 
-        <PlayerGrid
-          playerStates={playerStates}
-          propositions={propositions}
-          minPlayers={MIN_PLAYERS}
-          hasUnsavedChanges={hasUnsavedChanges}
-          onUpdatePlayerName={updatePlayerName}
-          onRemovePlayer={removePlayer}
-          onValidateItem={validateItem}
-          onRemoveValidation={removeValidation}
-        />
+        {/* Espacement ajouté entre le header et les cartes */}
+        <div className="mt-8">
+          <PlayerGrid
+            playerStates={playerStates}
+            propositions={propositions}
+            minPlayers={MIN_PLAYERS}
+            hasUnsavedChanges={hasUnsavedChanges}
+            onUpdatePlayerName={updatePlayerName}
+            onRemovePlayer={removePlayer}
+            onValidateItem={validateItem}
+            onRemoveValidation={removeValidation}
+          />
+        </div>
       </div>
     </div>
   );

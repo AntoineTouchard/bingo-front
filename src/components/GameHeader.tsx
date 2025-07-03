@@ -118,27 +118,48 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
               disabled={hasUnsavedChanges}
             />
             
-            <Tooltip content={hasUnsavedChanges ? "Sauvegardez ou annulez vos modifications avant d'ajouter un joueur" : ""}>
+            {hasUnsavedChanges ? (
+              <Tooltip content="Sauvegardez ou annulez vos modifications avant d'ajouter un joueur">
+                <button
+                  onClick={onAddPlayer}
+                  disabled={playerCount >= maxPlayers || hasUnsavedChanges}
+                  className="flex items-center gap-2 bg-gray-100 text-gray-400 px-4 py-2.5 rounded-xl cursor-not-allowed font-medium"
+                >
+                  <AlertTriangle size={18} />
+                  Ajouter joueur
+                </button>
+              </Tooltip>
+            ) : (
               <button
                 onClick={onAddPlayer}
-                disabled={playerCount >= maxPlayers || hasUnsavedChanges}
+                disabled={playerCount >= maxPlayers}
                 className="flex items-center gap-2 bg-gradient-to-r from-success-500 to-success-600 text-white px-4 py-2.5 rounded-xl hover:from-success-600 hover:to-success-700 transition-all duration-200 shadow-soft hover:shadow-medium disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 <Plus size={18} />
                 Ajouter joueur
               </button>
-            </Tooltip>
+            )}
             
-            <Tooltip content={hasUnsavedChanges ? "Sauvegardez ou annulez vos modifications avant de générer de nouvelles grilles" : ""}>
+            {hasUnsavedChanges ? (
+              <Tooltip content="Sauvegardez ou annulez vos modifications avant de générer de nouvelles grilles">
+                <button
+                  onClick={onGenerateNewGrids}
+                  disabled={hasUnsavedChanges}
+                  className="flex items-center gap-2 bg-gray-100 text-gray-400 px-4 py-2.5 rounded-xl cursor-not-allowed font-medium"
+                >
+                  <AlertTriangle size={18} />
+                  Nouvelles grilles
+                </button>
+              </Tooltip>
+            ) : (
               <button
                 onClick={onGenerateNewGrids}
-                disabled={hasUnsavedChanges}
-                className="flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2.5 rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-soft hover:shadow-medium disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2.5 rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
               >
                 <Shuffle size={18} />
                 Nouvelles grilles
               </button>
-            </Tooltip>
+            )}
             
             {/* Bouton sauvegarder - toujours visible pour les parties chargées */}
             {isLoadedGame && (

@@ -115,35 +115,47 @@ export const BingoGrid = ({
               <Target size={20} className="text-white" />
             </div>
             <h2 className="text-xl font-bold text-gray-800">{playerName}</h2>
-            <Tooltip content={hasUnsavedChanges ? "Sauvegardez ou annulez vos modifications avant de modifier le nom" : ""}>
+            {hasUnsavedChanges ? (
+              <Tooltip content="Sauvegardez ou annulez vos modifications avant de modifier le nom">
+                <button
+                  onClick={handleEditClick}
+                  disabled={hasUnsavedChanges}
+                  className="p-2 rounded-full bg-gray-100 text-gray-400 cursor-not-allowed transition-colors duration-200"
+                >
+                  <AlertTriangle size={16} />
+                </button>
+              </Tooltip>
+            ) : (
               <button
                 onClick={handleEditClick}
-                disabled={hasUnsavedChanges}
-                className={`p-2 rounded-full transition-colors duration-200 ${
-                  hasUnsavedChanges
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "hover:bg-gray-100 text-gray-400"
-                }`}
+                className="p-2 rounded-full hover:bg-gray-100 text-gray-400 transition-colors duration-200"
               >
-                {hasUnsavedChanges ? <AlertTriangle size={16} /> : <Edit2 size={16} />}
+                <Edit2 size={16} />
               </button>
-            </Tooltip>
+            )}
           </div>
         )}
         {isRemovable && (
-          <Tooltip content={hasUnsavedChanges ? "Sauvegardez ou annulez vos modifications avant de supprimer le joueur" : ""}>
-            <button
-              onClick={handleRemovePlayer}
-              disabled={hasUnsavedChanges}
-              className={`p-2 rounded-full transition-colors duration-200 ${
-                hasUnsavedChanges
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "hover:bg-error-100 text-error-500"
-              }`}
-            >
-              {hasUnsavedChanges ? <AlertTriangle size={18} /> : <XIcon size={18} />}
-            </button>
-          </Tooltip>
+          <>
+            {hasUnsavedChanges ? (
+              <Tooltip content="Sauvegardez ou annulez vos modifications avant de supprimer le joueur">
+                <button
+                  onClick={handleRemovePlayer}
+                  disabled={hasUnsavedChanges}
+                  className="p-2 rounded-full bg-gray-100 text-gray-400 cursor-not-allowed transition-colors duration-200"
+                >
+                  <AlertTriangle size={18} />
+                </button>
+              </Tooltip>
+            ) : (
+              <button
+                onClick={handleRemovePlayer}
+                className="p-2 rounded-full hover:bg-error-100 text-error-500 transition-colors duration-200"
+              >
+                <XIcon size={18} />
+              </button>
+            )}
+          </>
         )}
       </div>
       
@@ -230,22 +242,30 @@ export const BingoGrid = ({
                   shortDateFormat
                 )}
               </div>
-              <Tooltip content={hasUnsavedChanges ? "Sauvegardez ou annulez vos modifications avant de dévalider" : ""}>
+              {hasUnsavedChanges ? (
+                <Tooltip content="Sauvegardez ou annulez vos modifications avant de dévalider">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveValidation(index);
+                    }}
+                    disabled={hasUnsavedChanges}
+                    className="absolute top-2 right-2 p-1 rounded-full bg-gray-400 text-gray-300 cursor-not-allowed opacity-50 transition-colors duration-200"
+                  >
+                    <AlertTriangle size={14} />
+                  </button>
+                </Tooltip>
+              ) : (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     handleRemoveValidation(index);
                   }}
-                  disabled={hasUnsavedChanges}
-                  className={`absolute top-2 right-2 p-1 rounded-full transition-colors duration-200 ${
-                    hasUnsavedChanges
-                      ? "bg-gray-400 text-gray-300 cursor-not-allowed opacity-50"
-                      : "hover:bg-success-600 opacity-0 group-hover:opacity-100"
-                  }`}
+                  className="absolute top-2 right-2 p-1 rounded-full hover:bg-success-600 opacity-0 group-hover:opacity-100 transition-colors duration-200"
                 >
-                  {hasUnsavedChanges ? <AlertTriangle size={14} /> : <XIcon size={14} />}
+                  <XIcon size={14} />
                 </button>
-              </Tooltip>
+              )}
             </>
           )}
           
