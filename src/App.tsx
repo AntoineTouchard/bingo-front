@@ -32,13 +32,22 @@ function App() {
   } = gameState;
 
   const persistence = useGamePersistence(propositions, playerStates);
-  const { downloadGame, loadLastGame, loadGameFromFile } = persistence;
+  const { saveGame, downloadGame, loadLastGame, loadGameFromFile } = persistence;
 
   const handleNewChanges = (data: any) => {
     loadGameState(data, false);
   };
 
   const { playerOnline } = useSocket(handleNewChanges);
+
+  const handleSaveGame = async () => {
+    try {
+      await saveGame();
+      setIsChanged(false);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Erreur lors de la sauvegarde");
+    }
+  };
 
   const handleDownloadGame = async () => {
     try {
@@ -68,11 +77,11 @@ function App() {
       if (lastGameState) {
         loadGameState(lastGameState, false);
       } else {
-        console.log("Aucune sauvegarde trouvée, génération de nouvelles grilles");
+        alert("Aucune sauvegarde trouvée");
         generateNewGrids();
       }
     } catch (error) {
-      console.error("Erreur lors du chargement :", error);
+      alert("Erreur lors du chargement : " + error);
       generateNewGrids();
     }
   };
@@ -92,6 +101,7 @@ function App() {
           showAllButtons={!!showAllButtons}
           onAddPlayer={addPlayer}
           onGenerateNewGrids={() => generateNewGrids()}
+          onSaveGame={handleSaveGame}
           onDownloadGame={handleDownloadGame}
           onLoadGame={handleLoadGame}
           onLoadThisGame={loadGameState}

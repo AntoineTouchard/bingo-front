@@ -1,7 +1,6 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { GameState, PlayerState, Proposition } from '../types';
 import { generateGrid, generateGrids } from '../services/utils';
-import { useAutoSave } from './useAutoSave';
 
 interface UseGameStateReturn {
   propositions: Proposition[];
@@ -30,24 +29,6 @@ export const useGameState = (
   const [propositions, setPropositions] = useState<Proposition[]>(initialPropositions);
   const [playerStates, setPlayerStates] = useState<PlayerState[]>([]);
   const [isChanged, setIsChanged] = useState<boolean>(false);
-  const { autoSave } = useAutoSave();
-
-  // Fonction pour créer l'état du jeu actuel
-  const createCurrentGameState = useCallback((): GameState => ({
-    players: playerStates.map((playerState) => ({
-      ...playerState,
-      validatedItems: Array.from(playerState.validatedItems.entries()),
-    })),
-    propositions,
-  }), [propositions, playerStates]);
-
-  // Auto-save quand l'état change
-  useEffect(() => {
-    if (isChanged && (propositions.length > 0 || playerStates.length > 0)) {
-      const gameState = createCurrentGameState();
-      autoSave(gameState);
-    }
-  }, [isChanged, propositions, playerStates, autoSave, createCurrentGameState]);
 
   const generateNewGrids = useCallback((playerCount: number = playerStates.length || 6) => {
     const grids = generateGrids(propositions, playerCount, itemsPerGrid);
@@ -75,15 +56,15 @@ export const useGameState = (
           validatedItems: new Map(),
         },
       ]);
-      setIsChanged(true);
     }
+    setIsChanged(true);
   }, [playerStates.length, maxPlayers, propositions, itemsPerGrid]);
 
   const removePlayer = useCallback((index: number) => {
     if (playerStates.length > minPlayers) {
       setPlayerStates((prev) => prev.filter((_, i) => i !== index));
-      setIsChanged(true);
     }
+    setIsChanged(true);
   }, [playerStates.length, minPlayers]);
 
   const updatePlayerName = useCallback((index: number, newName: string) => {

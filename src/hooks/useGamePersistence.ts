@@ -1,8 +1,9 @@
 import { useCallback } from 'react';
-import { fetchLastSave } from '../services/Api.service';
+import { fetchLastSave, saveJson } from '../services/Api.service';
 import { GameState, PlayerState, Proposition } from '../types';
 
 interface UseGamePersistenceReturn {
+  saveGame: () => Promise<void>;
   downloadGame: () => Promise<void>;
   loadLastGame: () => Promise<GameState | null>;
   loadGameFromFile: (file: File) => Promise<GameState | null>;
@@ -19,6 +20,16 @@ export const useGamePersistence = (
     })),
     propositions,
   }), [propositions, playerStates]);
+
+  const saveGame = useCallback(async () => {
+    const gameState = createGameState();
+    try {
+      await saveJson(gameState);
+    } catch (error) {
+      console.error("Error saving game:", error);
+      throw new Error("Erreur lors de la sauvegarde du fichier source");
+    }
+  }, [createGameState]);
 
   const downloadGame = useCallback(async () => {
     const gameState = createGameState();
@@ -71,6 +82,7 @@ export const useGamePersistence = (
   }, []);
 
   return {
+    saveGame,
     downloadGame,
     loadLastGame,
     loadGameFromFile,
