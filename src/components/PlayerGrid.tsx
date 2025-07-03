@@ -21,25 +21,48 @@ export const PlayerGrid: React.FC<PlayerGridProps> = ({
   onValidateItem,
   onRemoveValidation,
 }) => {
+  // Créer un tableau avec les indices originaux et trier par nombre de cartes validées
+  const sortedPlayersWithIndex = playerStates
+    .map((state, originalIndex) => ({
+      state,
+      originalIndex,
+      validatedCount: state.validatedItems.size,
+    }))
+    .sort((a, b) => b.validatedCount - a.validatedCount); // Tri décroissant
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {playerStates.map((state, index) => (
-        <BingoGrid
-          key={index}
-          items={state.grid}
-          playerName={state.name}
-          onNameChange={(newName) => onUpdatePlayerName(index, newName)}
-          onRemove={() => onRemovePlayer(index)}
-          isRemovable={playerStates.length > minPlayers}
-          propositions={propositions}
-          validatedItems={state.validatedItems}
-          onValidateItem={(itemIndex, description) =>
-            onValidateItem(index, itemIndex, description)
-          }
-          onRemoveValidation={(itemIndex) =>
-            onRemoveValidation(index, itemIndex)
-          }
-        />
+      {sortedPlayersWithIndex.map(({ state, originalIndex, validatedCount }, displayIndex) => (
+        <div key={originalIndex} className="relative">
+          {/* Badge de position pour les 3 premiers */}
+          {displayIndex < 3 && validatedCount > 0 && (
+            <div className={`absolute -top-2 -right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-medium ${
+              displayIndex === 0 
+                ? 'bg-gradient-to-br from-yellow-400 to-yellow-500' 
+                : displayIndex === 1 
+                ? 'bg-gradient-to-br from-gray-400 to-gray-500'
+                : 'bg-gradient-to-br from-amber-600 to-amber-700'
+            }`}>
+              {displayIndex + 1}
+            </div>
+          )}
+          
+          <BingoGrid
+            items={state.grid}
+            playerName={state.name}
+            onNameChange={(newName) => onUpdatePlayerName(originalIndex, newName)}
+            onRemove={() => onRemovePlayer(originalIndex)}
+            isRemovable={playerStates.length > minPlayers}
+            propositions={propositions}
+            validatedItems={state.validatedItems}
+            onValidateItem={(itemIndex, description) =>
+              onValidateItem(originalIndex, itemIndex, description)
+            }
+            onRemoveValidation={(itemIndex) =>
+              onRemoveValidation(originalIndex, itemIndex)
+            }
+          />
+        </div>
       ))}
     </div>
   );
