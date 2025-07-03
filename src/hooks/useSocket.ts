@@ -16,7 +16,7 @@ export const useSocket = (onNewChanges: (data: GameState) => void): UseSocketRet
     const newSocket = io(
       hostname === "localhost"
         ? "http://localhost:3200/save"
-        : origin + "/save",
+        : "https://bingo.check-pvp.fr/save",
       {
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
