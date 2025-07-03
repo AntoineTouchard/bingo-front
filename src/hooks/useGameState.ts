@@ -37,16 +37,16 @@ export const useGameState = (
   const [isLoadedGame, setIsLoadedGame] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
 
-  // Auto-save effect - DÉSACTIVÉ pour les parties chargées
+  // Auto-save effect - Seulement pour les nouvelles parties (pas les parties chargées)
   useEffect(() => {
-    if (isChanged && !isLoadedGame && onAutoSave && !hasUnsavedChanges) {
+    if (isChanged && !isLoadedGame && onAutoSave) {
       const timeoutId = setTimeout(() => {
         onAutoSave();
       }, 1000); // Délai de 1 seconde pour éviter trop de sauvegardes
 
       return () => clearTimeout(timeoutId);
     }
-  }, [isChanged, isLoadedGame, onAutoSave, hasUnsavedChanges]);
+  }, [isChanged, isLoadedGame, onAutoSave]);
 
   // Fonction pour confirmer les changements non sauvegardés
   const confirmUnsavedChanges = useCallback((): boolean => {
@@ -88,20 +88,20 @@ export const useGameState = (
           validatedItems: new Map(),
         },
       ]);
-    }
-    setIsChanged(true);
-    if (isLoadedGame) {
-      setHasUnsavedChanges(true);
+      setIsChanged(true);
+      if (isLoadedGame) {
+        setHasUnsavedChanges(true);
+      }
     }
   }, [playerStates.length, maxPlayers, propositions, itemsPerGrid, isLoadedGame]);
 
   const removePlayer = useCallback((index: number) => {
     if (playerStates.length > minPlayers) {
       setPlayerStates((prev) => prev.filter((_, i) => i !== index));
-    }
-    setIsChanged(true);
-    if (isLoadedGame) {
-      setHasUnsavedChanges(true);
+      setIsChanged(true);
+      if (isLoadedGame) {
+        setHasUnsavedChanges(true);
+      }
     }
   }, [playerStates.length, minPlayers, isLoadedGame]);
 
@@ -187,9 +187,7 @@ export const useGameState = (
         validatedItems: new Map(player.validatedItems),
       }))
     );
-    if (updateIsChanged) {
-      setIsChanged(true);
-    }
+    setIsChanged(false); // Important: réinitialiser isChanged lors du chargement
     setIsLoadedGame(true);
     setHasUnsavedChanges(false);
   }, [hasUnsavedChanges, confirmUnsavedChanges]);

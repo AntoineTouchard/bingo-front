@@ -27,7 +27,7 @@ function App() {
         propositions,
       };
       await saveGame(gameStateData);
-      setIsChanged(false);
+      setIsChanged(false); // Marquer comme sauvegardé après la sauvegarde automatique
     } catch (error) {
       console.error("Auto-save failed:", error);
     }
@@ -79,7 +79,7 @@ function App() {
       };
       await saveGame(gameStateData);
       setIsChanged(false);
-      setIsLoadedGame(false);
+      setIsLoadedGame(false); // Après sauvegarde manuelle, ce n'est plus une partie chargée
     } catch (error) {
       alert(error instanceof Error ? error.message : "Erreur lors de la sauvegarde");
     }
