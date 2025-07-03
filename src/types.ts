@@ -1,6 +1,6 @@
 export interface Proposition {
-  text: string;
   id: string;
+  text: string;
 }
 
 export interface ValidatedItem {
@@ -16,47 +16,45 @@ export interface PlayerState {
 }
 
 export interface GameState {
-  players: PlayerState[];
+  players: Array<{
+    name: string;
+    grid: string[];
+    validatedItems: Array<[number, ValidatedItem]>;
+  }>;
   propositions: Proposition[];
 }
 
-
 export interface SaveResponse {
-    id: number
-    date: string
-    data?: string
+  id: string;
+  data: string;
+  date: string;
 }
 
 export interface SavesResponse {
-  id: number
-  date: string
-  data: GameState
+  id: string;
+  data: GameState;
+  date: string;
 }
 
 export const initialPropositions: Proposition[] = [
-  "Max annule la piscine",
-  "Il y a un problème d'export sur la croix rouge",
-  "Quelqu'un laisse la machine à café vide",
-  "Des tasses sont laissées sales",
-  "On livre en avance",
-  "Kévin dit : Je dois venir avec une brouette",
-  "Antoine raconte l'histoire du paillasson",
-  "Les sys-admin bricolent",
-  "Corentin a une question",
-  "Il n'y a plus de chargeur dispo",
-  "Anytime paye son coup ou a mangé",
-  "Il fait trop chaud / froid pour travailler à Nantes",
-  "Dans la salle de réunion : Vous nous entendez ?",
-  "Le tel de Antoine Babs sonne",
-  "Quelqu'un porte un pull Anytime",
-  "Il y a une fuite d'eau",
-  "Petit déjeuner avec Bertrand",
-  "Quelqu'un est croissanté",
-  "Rollback en prod",
-  "Plus personne ne veut aller à Paola",
-  "Il manque un meuble dans les locaux",
-  "Picota",
-  "Quelqu'un veut venir manger sans avoir mis un pouce",
-  "Seb fait une métaphore",
-  "Audrey tape Antoine Babs"
-].map(text => ({ text, id: crypto.randomUUID() }));
+  { id: "1", text: "Quelqu'un arrive en retard" },
+  { id: "2", text: "On parle de la météo" },
+  { id: "3", text: "Quelqu'un boit du café" },
+  { id: "4", text: "On mentionne un projet en cours" },
+  { id: "5", text: "Quelqu'un vérifie son téléphone" },
+  { id: "6", text: "On parle de weekend" },
+  { id: "7", text: "Quelqu'un pose une question technique" },
+  { id: "8", text: "On évoque les vacances" },
+  { id: "9", text: "Quelqu'un mange quelque chose" },
+  { id: "10", text: "On parle d'un collègue absent" },
+  { id: "11", text: "Quelqu'un fait une blague" },
+  { id: "12", text: "On mentionne un client" },
+  { id: "13", text: "Quelqu'un bâille" },
+  { id: "14", text: "On parle de sport" },
+  { id: "15", text: "Quelqu'un prend des notes" },
+  { id: "16", text: "On évoque un problème technique" },
+  { id: "17", text: "Quelqu'un dit 'exactement'" },
+  { id: "18", text: "On parle de budget" },
+  { id: "19", text: "Quelqu'un regarde par la fenêtre" },
+  { id: "20", text: "On mentionne une deadline" },
+];

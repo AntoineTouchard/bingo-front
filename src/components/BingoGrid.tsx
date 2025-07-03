@@ -52,99 +52,105 @@ export const BingoGrid = ({
     return propositions.find((p) => p.id === id)?.text || "";
   };
 
-  return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <div className="flex justify-between items-center mb-4">
-        {isEditing ? (
-          <div className="flex gap-2 items-center">
-            <input
-              type="text"
-              value={editedName}
-              onChange={(e) => setEditedName(e.target.value)}
-              className="text-xl font-bold text-indigo-600 border-b-2 border-indigo-200 focus:border-indigo-600 outline-none"
-              onKeyPress={(e) => e.key === "Enter" && handleNameSubmit()}
-              autoFocus
-            />
-            <button
-              onClick={handleNameSubmit}
-              className="p-1 hover:bg-indigo-50 rounded-full"
-            >
-              <Check size={18} className="text-indigo-600" />
-            </button>
-          </div>
-        ) : (
-          <div className="flex gap-2 items-center">
-            <h2 className="text-xl font-bold text-indigo-600">{playerName}</h2>
-            <button
-              onClick={() => setIsEditing(true)}
-              className="p-1 hover:bg-indigo-50 rounded-full"
-            >
-              <Edit2 size={18} className="text-indigo-400" />
-            </button>
-          </div>
-        )}
-        {isRemovable && (
+  const renderPlayerHeader = () => (
+    <div className="flex justify-between items-center mb-4">
+      {isEditing ? (
+        <div className="flex gap-2 items-center">
+          <input
+            type="text"
+            value={editedName}
+            onChange={(e) => setEditedName(e.target.value)}
+            className="text-xl font-bold text-indigo-600 border-b-2 border-indigo-200 focus:border-indigo-600 outline-none"
+            onKeyPress={(e) => e.key === "Enter" && handleNameSubmit()}
+            autoFocus
+          />
           <button
-            onClick={onRemove}
-            className="p-1 hover:bg-red-50 rounded-full"
+            onClick={handleNameSubmit}
+            className="p-1 hover:bg-indigo-50 rounded-full"
           >
-            <XIcon size={18} className="text-red-500" />
+            <Check size={18} className="text-indigo-600" />
           </button>
-        )}
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        {items.map((itemId, index) => {
-          const isValidated = validatedItems.has(index);
-          const validatedItem = validatedItems.get(index);
-          const propositionText = getPropositionById(itemId);
+        </div>
+      ) : (
+        <div className="flex gap-2 items-center">
+          <h2 className="text-xl font-bold text-indigo-600">{playerName}</h2>
+          <button
+            onClick={() => setIsEditing(true)}
+            className="p-1 hover:bg-indigo-50 rounded-full"
+          >
+            <Edit2 size={18} className="text-indigo-400" />
+          </button>
+        </div>
+      )}
+      {isRemovable && (
+        <button
+          onClick={onRemove}
+          className="p-1 hover:bg-red-50 rounded-full"
+        >
+          <XIcon size={18} className="text-red-500" />
+        </button>
+      )}
+    </div>
+  );
 
-          return (
-            <div key={index} className="relative">
-              <div
-                onClick={() =>
-                  !isValidated &&
-                  setSelectedItem({ index, text: propositionText })
-                }
-                className={`p-3 border-2 rounded-lg cursor-pointer h-[160px] text-center transition-all duration-200 text-sm ${
-                  isValidated
-                    ? "bg-indigo-600 text-white border-indigo-700 shadow-inner overflow-y-auto"
-                    : "border-indigo-200 hover:bg-indigo-50"
-                }`}
-              >
-                <div
-                  className={`text-[14px] leading-none font-bold ${
-                    isValidated ? "text-white" : "text-indigo-600"
-                  }`}
-                >
-                  {propositionText}
-                </div>
-                {isValidated && (
-                  <>
-                    <div className="mt-2 leading-none text-[12px] italic">
-                      {validatedItem?.description}
-                    </div>
-                    <div className="text-[12px] italic opacity-80 flex flex-row items-center justify-center mt-2 leading-3">
-                      <Check className="text-green-500 mr-1" size={12} />
-                      {new Date(validatedItem?.timestamp).toLocaleString(
-                        "fr-FR",
-                        shortDateFormat
-                      )}
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onRemoveValidation(index);
-                      }}
-                      className="absolute top-2 right-3 p-1 hover:bg-indigo-700 rounded-full"
-                    >
-                      <XIcon size={14} />
-                    </button>
-                  </>
+  const renderGridItem = (itemId: string, index: number) => {
+    const isValidated = validatedItems.has(index);
+    const validatedItem = validatedItems.get(index);
+    const propositionText = getPropositionById(itemId);
+
+    return (
+      <div key={index} className="relative">
+        <div
+          onClick={() =>
+            !isValidated &&
+            setSelectedItem({ index, text: propositionText })
+          }
+          className={`p-3 border-2 rounded-lg cursor-pointer h-[160px] text-center transition-all duration-200 text-sm ${
+            isValidated
+              ? "bg-indigo-600 text-white border-indigo-700 shadow-inner overflow-y-auto"
+              : "border-indigo-200 hover:bg-indigo-50"
+          }`}
+        >
+          <div
+            className={`text-[14px] leading-none font-bold ${
+              isValidated ? "text-white" : "text-indigo-600"
+            }`}
+          >
+            {propositionText}
+          </div>
+          {isValidated && (
+            <>
+              <div className="mt-2 leading-none text-[12px] italic">
+                {validatedItem?.description}
+              </div>
+              <div className="text-[12px] italic opacity-80 flex flex-row items-center justify-center mt-2 leading-3">
+                <Check className="text-green-500 mr-1" size={12} />
+                {new Date(validatedItem?.timestamp).toLocaleString(
+                  "fr-FR",
+                  shortDateFormat
                 )}
               </div>
-            </div>
-          );
-        })}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemoveValidation(index);
+                }}
+                className="absolute top-2 right-3 p-1 hover:bg-indigo-700 rounded-full"
+              >
+                <XIcon size={14} />
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-lg p-6">
+      {renderPlayerHeader()}
+      <div className="grid grid-cols-2 gap-4">
+        {items.map((itemId, index) => renderGridItem(itemId, index))}
       </div>
 
       <Modal
