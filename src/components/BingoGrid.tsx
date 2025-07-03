@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Proposition, ValidatedItem } from "../types";
-import { Check, Edit2, XIcon } from "lucide-react";
+import { Check, Edit2, XIcon, Trophy, Target } from "lucide-react";
 import { Modal } from "./Modal";
 import { shortDateFormat } from "../services/utils";
 
@@ -52,44 +52,69 @@ export const BingoGrid = ({
     return propositions.find((p) => p.id === id)?.text || "";
   };
 
+  const validatedCount = validatedItems.size;
+  const progressPercentage = (validatedCount / items.length) * 100;
+
   const renderPlayerHeader = () => (
-    <div className="flex justify-between items-center mb-4">
-      {isEditing ? (
-        <div className="flex gap-2 items-center">
-          <input
-            type="text"
-            value={editedName}
-            onChange={(e) => setEditedName(e.target.value)}
-            className="text-xl font-bold text-indigo-600 border-b-2 border-indigo-200 focus:border-indigo-600 outline-none"
-            onKeyPress={(e) => e.key === "Enter" && handleNameSubmit()}
-            autoFocus
-          />
+    <div className="mb-6">
+      <div className="flex justify-between items-center mb-4">
+        {isEditing ? (
+          <div className="flex gap-2 items-center">
+            <input
+              type="text"
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              className="text-xl font-bold text-primary-600 border-b-2 border-primary-200 focus:border-primary-600 outline-none bg-transparent"
+              onKeyPress={(e) => e.key === "Enter" && handleNameSubmit()}
+              autoFocus
+            />
+            <button
+              onClick={handleNameSubmit}
+              className="p-2 hover:bg-primary-100 rounded-full transition-colors duration-200"
+            >
+              <Check size={18} className="text-primary-600" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-3 items-center">
+            <div className="p-2 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg">
+              <Target size={20} className="text-white" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-800">{playerName}</h2>
+            <button
+              onClick={() => setIsEditing(true)}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+            >
+              <Edit2 size={16} className="text-gray-400" />
+            </button>
+          </div>
+        )}
+        {isRemovable && (
           <button
-            onClick={handleNameSubmit}
-            className="p-1 hover:bg-indigo-50 rounded-full"
+            onClick={onRemove}
+            className="p-2 hover:bg-error-100 rounded-full transition-colors duration-200"
           >
-            <Check size={18} className="text-indigo-600" />
+            <XIcon size={18} className="text-error-500" />
           </button>
+        )}
+      </div>
+      
+      {/* Progress bar */}
+      <div className="space-y-2">
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-gray-600">Progression</span>
+          <div className="flex items-center gap-2">
+            <Trophy size={16} className="text-warning-500" />
+            <span className="font-bold text-gray-800">{validatedCount}/{items.length}</span>
+          </div>
         </div>
-      ) : (
-        <div className="flex gap-2 items-center">
-          <h2 className="text-xl font-bold text-indigo-600">{playerName}</h2>
-          <button
-            onClick={() => setIsEditing(true)}
-            className="p-1 hover:bg-indigo-50 rounded-full"
-          >
-            <Edit2 size={18} className="text-indigo-400" />
-          </button>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div 
+            className="bg-gradient-to-r from-success-400 to-success-500 h-2 rounded-full transition-all duration-500"
+            style={{ width: `${progressPercentage}%` }}
+          ></div>
         </div>
-      )}
-      {isRemovable && (
-        <button
-          onClick={onRemove}
-          className="p-1 hover:bg-red-50 rounded-full"
-        >
-          <XIcon size={18} className="text-red-500" />
-        </button>
-      )}
+      </div>
     </div>
   );
 
@@ -99,32 +124,33 @@ export const BingoGrid = ({
     const propositionText = getPropositionById(itemId);
 
     return (
-      <div key={index} className="relative">
+      <div key={index} className="relative group">
         <div
           onClick={() =>
             !isValidated &&
             setSelectedItem({ index, text: propositionText })
           }
-          className={`p-3 border-2 rounded-lg cursor-pointer h-[160px] text-center transition-all duration-200 text-sm ${
+          className={`p-4 border-2 rounded-xl cursor-pointer h-[160px] text-center transition-all duration-300 text-sm relative overflow-hidden ${
             isValidated
-              ? "bg-indigo-600 text-white border-indigo-700 shadow-inner overflow-y-auto"
-              : "border-indigo-200 hover:bg-indigo-50"
+              ? "bg-gradient-to-br from-success-500 to-success-600 text-white border-success-600 shadow-medium transform scale-105"
+              : "border-gray-200 hover:border-primary-300 hover:bg-primary-50 hover:shadow-soft bg-white"
           }`}
         >
           <div
-            className={`text-[14px] leading-none font-bold ${
-              isValidated ? "text-white" : "text-indigo-600"
+            className={`text-sm font-bold leading-tight ${
+              isValidated ? "text-white" : "text-gray-700"
             }`}
           >
             {propositionText}
           </div>
+          
           {isValidated && (
             <>
-              <div className="mt-2 leading-none text-[12px] italic">
+              <div className="mt-3 text-xs italic opacity-90 leading-tight">
                 {validatedItem?.description}
               </div>
-              <div className="text-[12px] italic opacity-80 flex flex-row items-center justify-center mt-2 leading-3">
-                <Check className="text-green-500 mr-1" size={12} />
+              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 text-xs italic opacity-80 flex items-center gap-1">
+                <Check size={12} className="text-success-200" />
                 {new Date(validatedItem?.timestamp).toLocaleString(
                   "fr-FR",
                   shortDateFormat
@@ -135,11 +161,15 @@ export const BingoGrid = ({
                   e.stopPropagation();
                   onRemoveValidation(index);
                 }}
-                className="absolute top-2 right-3 p-1 hover:bg-indigo-700 rounded-full"
+                className="absolute top-2 right-2 p-1 hover:bg-success-600 rounded-full transition-colors duration-200 opacity-0 group-hover:opacity-100"
               >
                 <XIcon size={14} />
               </button>
             </>
+          )}
+          
+          {!isValidated && (
+            <div className="absolute inset-0 bg-gradient-to-br from-primary-500/0 to-secondary-500/0 group-hover:from-primary-500/5 group-hover:to-secondary-500/5 transition-all duration-300 rounded-xl"></div>
           )}
         </div>
       </div>
@@ -147,7 +177,7 @@ export const BingoGrid = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft p-6 hover:shadow-medium transition-all duration-300 animate-fade-in">
       {renderPlayerHeader()}
       <div className="grid grid-cols-2 gap-4">
         {items.map((itemId, index) => renderGridItem(itemId, index))}
@@ -157,30 +187,37 @@ export const BingoGrid = ({
         isOpen={selectedItem !== null}
         onClose={() => setSelectedItem(null)}
       >
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">
-            Validation de la proposition
-          </h3>
-          <p className="text-gray-600">{selectedItem?.text}</p>
+        <div className="space-y-6">
+          <div className="text-center">
+            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <Check size={24} className="text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">
+              Validation de la proposition
+            </h3>
+            <p className="text-gray-600 bg-gray-50 p-3 rounded-lg">{selectedItem?.text}</p>
+          </div>
+          
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Décrivez le contexte..."
-            className="w-full p-2 border rounded-lg focus:outline-indigo-500"
-            rows={3}
+            placeholder="Décrivez le contexte de cette validation..."
+            className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-primary-400 focus:ring-4 focus:ring-primary-100 outline-none transition-all duration-200 resize-none"
+            rows={4}
             autoFocus
           />
-          <div className="flex justify-end gap-2">
+          
+          <div className="flex gap-3">
             <button
               onClick={() => setSelectedItem(null)}
-              className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+              className="flex-1 px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors duration-200 font-medium"
             >
               Annuler
             </button>
             <button
               onClick={handleValidation}
               disabled={!description.trim()}
-              className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50"
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-success-500 to-success-600 text-white rounded-xl hover:from-success-600 hover:to-success-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-soft"
             >
               Valider
             </button>
