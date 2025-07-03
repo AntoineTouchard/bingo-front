@@ -10,6 +10,7 @@ export interface ValidatedItem {
 }
 
 export interface PlayerState {
+  id: string; // Ajout d'un ID unique pour chaque joueur
   name: string;
   grid: string[];
   validatedItems: Map<number, ValidatedItem>;
@@ -17,6 +18,7 @@ export interface PlayerState {
 
 export interface GameState {
   players: Array<{
+    id: string; // Ajout de l'ID dans la structure de sauvegarde
     name: string;
     grid: string[];
     validatedItems: Array<[number, ValidatedItem]>;

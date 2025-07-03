@@ -21,7 +21,9 @@ function App() {
     try {
       const gameStateData = {
         players: playerStates.map((playerState) => ({
-          ...playerState,
+          id: playerState.id, // Inclure l'ID dans la sauvegarde
+          name: playerState.name,
+          grid: playerState.grid,
           validatedItems: Array.from(playerState.validatedItems.entries()),
         })),
         propositions,
@@ -75,7 +77,9 @@ function App() {
     try {
       const gameStateData = {
         players: playerStates.map((playerState) => ({
-          ...playerState,
+          id: playerState.id, // Inclure l'ID dans la sauvegarde
+          name: playerState.name,
+          grid: playerState.grid,
           validatedItems: Array.from(playerState.validatedItems.entries()),
         })),
         propositions,
@@ -93,7 +97,9 @@ function App() {
     try {
       const gameStateData = {
         players: playerStates.map((playerState) => ({
-          ...playerState,
+          id: playerState.id, // Inclure l'ID dans la sauvegarde
+          name: playerState.name,
+          grid: playerState.grid,
           validatedItems: Array.from(playerState.validatedItems.entries()),
         })),
         propositions,

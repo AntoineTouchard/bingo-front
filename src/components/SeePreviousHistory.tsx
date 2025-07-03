@@ -68,50 +68,86 @@ export const SeePreviousHistory = ({
       propositionsRemoved: [] as string[],
     };
 
-    // Comparer les joueurs
-    const currentPlayerNames = currentSave.data.players.map(p => p.name);
-    const previousPlayerNames = previousSave.data.players.map(p => p.name);
+    // Créer des maps pour faciliter la comparaison par ID
+    const currentPlayersById = new Map(currentSave.data.players.map(p => [p.id || p.name, p]));
+    const previousPlayersById = new Map(previousSave.data.players.map(p => [p.id || p.name, p]));
 
-    // Joueurs ajoutés
-    differences.playersAdded = currentPlayerNames.filter(name => !previousPlayerNames.includes(name));
-    
-    // Joueurs supprimés
-    differences.playersRemoved = previousPlayerNames.filter(name => !currentPlayerNames.includes(name));
+    // Comparer les joueurs par ID
+    const currentPlayerIds = new Set(currentPlayersById.keys());
+    const previousPlayerIds = new Set(previousPlayersById.keys());
 
-    // Comparer les validations pour chaque joueur
-    currentSave.data.players.forEach(currentPlayer => {
-      const previousPlayer = previousSave.data.players.find(p => p.name === currentPlayer.name);
-      if (previousPlayer) {
-        // Validations ajoutées
-        currentPlayer.validatedItems.forEach(([index, validation]) => {
-          const wasValidated = previousPlayer.validatedItems.some(([prevIndex]) => prevIndex === index);
-          if (!wasValidated) {
-            const proposition = currentSave.data.propositions.find(p => p.id === validation.propositionId);
-            if (proposition) {
-              differences.validationsAdded.push({
-                player: currentPlayer.name,
-                proposition: proposition.text,
-                description: validation.description
-              });
-            }
-          }
-        });
-
-        // Validations supprimées
-        previousPlayer.validatedItems.forEach(([index, validation]) => {
-          const stillValidated = currentPlayer.validatedItems.some(([currIndex]) => currIndex === index);
-          if (!stillValidated) {
-            const proposition = previousSave.data.propositions.find(p => p.id === validation.propositionId);
-            if (proposition) {
-              differences.validationsRemoved.push({
-                player: currentPlayer.name,
-                proposition: proposition.text
-              });
-            }
-          }
-        });
+    // Joueurs ajoutés (nouveaux IDs)
+    for (const id of currentPlayerIds) {
+      if (!previousPlayerIds.has(id)) {
+        const player = currentPlayersById.get(id);
+        if (player) {
+          differences.playersAdded.push(player.name);
+        }
       }
-    });
+    }
+
+    // Joueurs supprimés (IDs qui n'existent plus)
+    for (const id of previousPlayerIds) {
+      if (!currentPlayerIds.has(id)) {
+        const player = previousPlayersById.get(id);
+        if (player) {
+          differences.playersRemoved.push(player.name);
+        }
+      }
+    }
+
+    // Joueurs renommés (même ID, nom différent)
+    for (const id of currentPlayerIds) {
+      if (previousPlayerIds.has(id)) {
+        const currentPlayer = currentPlayersById.get(id);
+        const previousPlayer = previousPlayersById.get(id);
+        if (currentPlayer && previousPlayer && currentPlayer.name !== previousPlayer.name) {
+          differences.playersRenamed.push({
+            from: previousPlayer.name,
+            to: currentPlayer.name
+          });
+        }
+      }
+    }
+
+    // Comparer les validations pour chaque joueur (par ID)
+    for (const id of currentPlayerIds) {
+      if (previousPlayerIds.has(id)) {
+        const currentPlayer = currentPlayersById.get(id);
+        const previousPlayer = previousPlayersById.get(id);
+        
+        if (currentPlayer && previousPlayer) {
+          // Validations ajoutées
+          currentPlayer.validatedItems.forEach(([index, validation]) => {
+            const wasValidated = previousPlayer.validatedItems.some(([prevIndex]) => prevIndex === index);
+            if (!wasValidated) {
+              const proposition = currentSave.data.propositions.find(p => p.id === validation.propositionId);
+              if (proposition) {
+                differences.validationsAdded.push({
+                  player: currentPlayer.name,
+                  proposition: proposition.text,
+                  description: validation.description
+                });
+              }
+            }
+          });
+
+          // Validations supprimées
+          previousPlayer.validatedItems.forEach(([index, validation]) => {
+            const stillValidated = currentPlayer.validatedItems.some(([currIndex]) => currIndex === index);
+            if (!stillValidated) {
+              const proposition = previousSave.data.propositions.find(p => p.id === validation.propositionId);
+              if (proposition) {
+                differences.validationsRemoved.push({
+                  player: currentPlayer.name,
+                  proposition: proposition.text
+                });
+              }
+            }
+          });
+        }
+      }
+    }
 
     // Comparer les propositions
     const currentPropositionTexts = currentSave.data.propositions.map(p => p.text);
@@ -154,6 +190,22 @@ export const SeePreviousHistory = ({
             <Minus size={14} className="text-error-600 mt-0.5 flex-shrink-0" />
             <div className="text-xs text-error-700">
               <span className="font-medium">Joueurs supprimés :</span> {differences.playersRemoved.join(", ")}
+            </div>
+          </div>
+        )}
+
+        {differences.playersRenamed.length > 0 && (
+          <div className="flex items-start gap-2">
+            <Edit size={14} className="text-warning-600 mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-warning-700">
+              <span className="font-medium">Joueurs renommés :</span>
+              <div className="ml-2 space-y-1">
+                {differences.playersRenamed.map((rename: any, index: number) => (
+                  <div key={index} className="bg-warning-100 p-2 rounded text-xs">
+                    <span className="font-medium">{rename.from}</span> → <span className="font-medium">{rename.to}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -291,7 +343,7 @@ export const SeePreviousHistory = ({
                           
                           return (
                             <div 
-                              key={playerIndex} 
+                              key={player.id || playerIndex} 
                               className={`flex justify-between items-center p-2 rounded-lg transition-all duration-200 ${
                                 isWinner 
                                   ? 'bg-gradient-to-r from-warning-50 to-warning-100 border border-warning-200' 

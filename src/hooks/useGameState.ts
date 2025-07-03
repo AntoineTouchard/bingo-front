@@ -66,6 +66,7 @@ export const useGameState = (
       const newStates = Array(playerCount)
         .fill(null)
         .map((_, i) => ({
+          id: prev[i]?.id || crypto.randomUUID(), // Conserver l'ID existant ou en créer un nouveau
           name: prev[i]?.name || `Joueur ${i + 1}`,
           grid: grids[i],
           validatedItems: new Map(),
@@ -83,6 +84,7 @@ export const useGameState = (
       setPlayerStates((prev) => [
         ...prev,
         {
+          id: crypto.randomUUID(), // Générer un ID unique pour le nouveau joueur
           name: `Joueur ${prev.length + 1}`,
           grid: newGrid,
           validatedItems: new Map(),
@@ -162,7 +164,9 @@ export const useGameState = (
     setPropositions(gameState.propositions);
     setPlayerStates(
       gameState.players.map((player) => ({
-        ...player,
+        id: player.id || crypto.randomUUID(), // Assurer qu'il y a toujours un ID
+        name: player.name,
+        grid: player.grid,
         validatedItems: new Map(player.validatedItems),
       }))
     );
