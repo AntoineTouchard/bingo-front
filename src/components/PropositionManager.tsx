@@ -37,15 +37,21 @@ export const PropositionManager = ({
       </button>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="space-y-6">
+        <div className="space-y-4">
+          {/* Header compact */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-gradient-to-br from-warning-400 to-warning-500 rounded-lg">
                 <Lightbulb size={20} className="text-white" />
               </div>
-              <h2 className="text-xl font-bold text-gray-800">
-                Gérer les propositions
-              </h2>
+              <div>
+                <h2 className="text-lg font-bold text-gray-800">
+                  Gérer les propositions
+                </h2>
+                <div className="bg-primary-100 text-primary-700 px-2 py-1 rounded-full text-xs font-medium">
+                  {propositions.length} proposition{propositions.length > 1 ? "s" : ""}
+                </div>
+              </div>
             </div>
             <button
               onClick={() => setIsModalOpen(false)}
@@ -55,6 +61,7 @@ export const PropositionManager = ({
             </button>
           </div>
           
+          {/* Formulaire d'ajout */}
           <form onSubmit={handleSubmit} className="flex gap-3">
             <input
               type="text"
@@ -67,56 +74,55 @@ export const PropositionManager = ({
             <button
               type="submit"
               disabled={!newProposition.trim()}
-              className="flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-soft hover:shadow-medium disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              className="flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-3 rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-soft hover:shadow-medium disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
-              <Plus size={18} />
+              <Plus size={16} />
               Ajouter
             </button>
           </form>
           
-          <div className="max-h-96 overflow-y-auto space-y-2 border-t pt-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-700">
-                Propositions actuelles
-              </h3>
-              <div className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm font-medium">
-                {propositions.length} proposition{propositions.length > 1 ? "s" : ""}
-              </div>
-            </div>
+          {/* Liste des propositions avec hauteur limitée */}
+          <div className="border-t pt-4">
+            <h3 className="font-semibold text-gray-700 mb-3">
+              Propositions actuelles
+            </h3>
             
-            {propositions.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Lightbulb size={48} className="mx-auto mb-4 text-gray-300" />
-                <p>Aucune proposition pour le moment</p>
-                <p className="text-sm">Ajoutez-en une pour commencer !</p>
-              </div>
-            ) : (
-              propositions.map((prop, index) => (
-                <div
-                  key={prop.id}
-                  className="flex justify-between items-center p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200 group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                      {index + 1}
-                    </div>
-                    <span className="text-gray-700">{prop.text}</span>
-                  </div>
-                  <button
-                    onClick={() => onRemoveProposition(prop.id)}
-                    className="p-2 hover:bg-error-100 rounded-lg transition-colors duration-200 opacity-0 group-hover:opacity-100"
-                  >
-                    <XIcon size={16} className="text-error-500" />
-                  </button>
+            <div className="max-h-64 overflow-y-auto space-y-2 pr-2">
+              {propositions.length === 0 ? (
+                <div className="text-center py-6 text-gray-500">
+                  <Lightbulb size={32} className="mx-auto mb-3 text-gray-300" />
+                  <p className="text-sm">Aucune proposition pour le moment</p>
+                  <p className="text-xs text-gray-400">Ajoutez-en une pour commencer !</p>
                 </div>
-              ))
-            )}
+              ) : (
+                propositions.map((prop, index) => (
+                  <div
+                    key={prop.id}
+                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 group"
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="w-6 h-6 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                        {index + 1}
+                      </div>
+                      <span className="text-gray-700 text-sm truncate">{prop.text}</span>
+                    </div>
+                    <button
+                      onClick={() => onRemoveProposition(prop.id)}
+                      className="p-1.5 hover:bg-error-100 rounded-lg transition-colors duration-200 opacity-0 group-hover:opacity-100 flex-shrink-0"
+                    >
+                      <XIcon size={14} className="text-error-500" />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
           
-          <div className="flex justify-end pt-4 border-t">
+          {/* Footer compact */}
+          <div className="flex justify-end pt-3 border-t">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors duration-200 font-medium"
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-medium text-sm"
             >
               Fermer
             </button>
