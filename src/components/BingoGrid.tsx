@@ -124,8 +124,14 @@ export const BingoGrid = ({
     const validatedItem = validatedItems.get(index);
     const propositionText = getPropositionById(itemId);
 
-    // Fonction pour déterminer si le texte est trop long
-    const isTextLong = (text: string) => text.length > 50;
+    // Fonction pour tronquer le texte élégamment
+    const truncateText = (text: string, maxLength: number = 80) => {
+      if (text.length <= maxLength) return text;
+      return text.substring(0, maxLength).trim() + "...";
+    };
+
+    const description = validatedItem?.description || "";
+    const isTextTruncated = description.length > 80;
 
     return (
       <div key={index} className="relative group">
@@ -134,15 +140,14 @@ export const BingoGrid = ({
             !isValidated &&
             setSelectedItem({ index, text: propositionText })
           }
-          className={`p-4 border-2 rounded-xl cursor-pointer h-[160px] text-center transition-all duration-300 text-sm relative overflow-hidden flex flex-col ${
+          className={`p-4 border-2 rounded-xl cursor-pointer h-[160px] text-center transition-all duration-300 text-sm relative overflow-hidden ${
             isValidated
               ? "bg-gradient-to-br from-success-500 to-success-600 text-white border-success-600 shadow-medium transform scale-105"
               : "border-gray-200 hover:border-primary-300 hover:bg-primary-50 hover:shadow-soft bg-white"
           }`}
         >
-          {/* Titre de la proposition */}
           <div
-            className={`text-sm font-bold leading-tight mb-2 ${
+            className={`text-sm font-bold leading-tight ${
               isValidated ? "text-white" : "text-gray-700"
             }`}
           >
@@ -151,46 +156,34 @@ export const BingoGrid = ({
           
           {isValidated && (
             <>
-              {/* Description - avec tooltip si trop longue */}
-              <div className="flex-1 flex items-center justify-center min-h-0">
-                {isTextLong(validatedItem?.description || "") ? (
+              <div className="mt-3 mb-8">
+                {isTextTruncated ? (
                   <Tooltip
                     content={
                       <div className="max-w-xs">
-                        <div className="font-semibold mb-2 text-white">Description complète :</div>
-                        <div className="text-sm leading-relaxed">{validatedItem?.description}</div>
+                        <div className="text-sm leading-relaxed">{description}</div>
                       </div>
                     }
                     side="top"
                   >
-                    <div className="text-xs italic opacity-90 leading-tight text-center overflow-hidden cursor-help hover:opacity-100 transition-opacity duration-200">
-                      <div className="max-h-16 overflow-y-auto scrollbar-thin scrollbar-thumb-success-300 scrollbar-track-transparent">
-                        {validatedItem?.description}
-                      </div>
-                      <div className="text-xs mt-1 opacity-70">
-                        ℹ️ Survolez pour voir le texte complet
-                      </div>
+                    <div className="text-xs italic opacity-90 leading-tight cursor-help">
+                      {truncateText(description)}
                     </div>
                   </Tooltip>
                 ) : (
-                  <div className="text-xs italic opacity-90 leading-tight text-center overflow-hidden">
-                    {validatedItem?.description}
+                  <div className="text-xs italic opacity-90 leading-tight">
+                    {description}
                   </div>
                 )}
               </div>
               
-              {/* Date - fixée en bas */}
-              <div className="mt-auto pt-2 text-xs italic opacity-80 flex items-center justify-center gap-1">
-                <Check size={12} className="text-success-200 flex-shrink-0" />
-                <span className="truncate">
-                  {new Date(validatedItem?.timestamp).toLocaleString(
-                    "fr-FR",
-                    shortDateFormat
-                  )}
-                </span>
+              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 text-xs italic opacity-80 flex items-center gap-1">
+                <Check size={12} className="text-success-200" />
+                {new Date(validatedItem?.timestamp).toLocaleString(
+                  "fr-FR",
+                  shortDateFormat
+                )}
               </div>
-              
-              {/* Bouton de suppression */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
