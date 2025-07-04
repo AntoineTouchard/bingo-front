@@ -86,26 +86,15 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
               Nouvelles grilles
             </button>
 
-            {/* Bouton de sauvegarde - visible quand il y a des changements ou après chargement */}
-            {(isChanged || isLoadedGame || hasUnsavedChanges) && (
-              <Tooltip content={
-                isChanged ? "Sauvegarder les modifications" : 
-                isLoadedGame ? "Sauvegarder cette partie" :
-                "Sauvegarder les changements"
-              }>
+            {/* Bouton de sauvegarde - visible uniquement quand une partie est chargée */}
+            {isLoadedGame && (
+              <Tooltip content="Sauvegarder cette partie">
                 <button
                   onClick={onSaveGame}
-                  className={`flex items-center gap-2 text-white px-4 py-2.5 rounded-xl transition-all duration-200 shadow-soft hover:shadow-medium font-medium ${
-                    isChanged || hasUnsavedChanges
-                      ? "bg-gradient-to-r from-warning-500 to-warning-600 hover:from-warning-600 hover:to-warning-700 animate-pulse"
-                      : "bg-gradient-to-r from-success-500 to-success-600 hover:from-success-600 hover:to-success-700"
-                  }`}
+                  className="flex items-center gap-2 bg-gradient-to-r from-success-500 to-success-600 text-white px-4 py-2.5 rounded-xl hover:from-success-600 hover:to-success-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
                 >
                   <Save size={18} />
                   Sauvegarder
-                  {(isChanged || hasUnsavedChanges) && (
-                    <div className="w-2 h-2 bg-warning-200 rounded-full animate-bounce"></div>
-                  )}
                 </button>
               </Tooltip>
             )}
