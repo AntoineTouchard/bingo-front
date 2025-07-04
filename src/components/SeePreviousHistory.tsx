@@ -15,6 +15,8 @@ import {
   Edit,
   ChevronDown,
   ChevronRight,
+  ChevronUp,
+  Eye,
 } from "lucide-react";
 import { Tooltip } from "./Tooltip";
 import { datetimeFormat } from "../services/utils";
@@ -27,6 +29,7 @@ export const SeePreviousHistory = ({
   const [isOpened, setIsOpened] = useState(false);
   const [saves, setSaves] = useState<SavesResponse[]>([]);
   const [expandedDiffs, setExpandedDiffs] = useState<Set<string>>(new Set());
+  const [showAllSaves, setShowAllSaves] = useState(false);
 
   const handleLoadGame = (data: GameState) => {
     loadThisGame(data);
@@ -343,6 +346,100 @@ export const SeePreviousHistory = ({
     );
   };
 
+  // Fonction pour créer le tooltip complet d'un joueur
+  const createPlayerTooltip = (player: any, save: SavesResponse) => {
+    const validatedPropositionIds = new Set(
+      player.validatedItems.map(([_, item]: [number, any]) => item.propositionId)
+    );
+
+    const validatedItems = player.validatedItems.map(([key, item]: [number, any]) => {
+      const proposition = save.data.propositions.find(
+        (p) => p.id === item.propositionId
+      );
+      return {
+        key,
+        proposition: proposition?.text || "Proposition inconnue",
+        description: item.description,
+        timestamp: item.timestamp,
+        validated: true,
+      };
+    });
+
+    const unvalidatedItems = player.grid
+      .map((propositionId: string, index: number) => {
+        if (!validatedPropositionIds.has(propositionId)) {
+          const proposition = save.data.propositions.find(
+            (p) => p.id === propositionId
+          );
+          return {
+            key: index,
+            proposition: proposition?.text || "Proposition inconnue",
+            validated: false,
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    const allItems = [...validatedItems, ...unvalidatedItems].sort(
+      (a, b) => a.key - b.key
+    );
+
+    return (
+      <div className="space-y-3 max-w-sm">
+        <div className="text-sm font-bold text-center border-b border-gray-200 pb-2">
+          Grille de {player.name}
+        </div>
+        
+        <div className="space-y-2 max-h-80 overflow-y-auto">
+          {allItems.map((item: any) => (
+            <div
+              key={item.key}
+              className={`p-2 rounded-lg border-l-4 ${
+                item.validated
+                  ? "bg-success-50 border-success-400"
+                  : "bg-gray-50 border-gray-300"
+              }`}
+            >
+              <div className="flex items-start gap-2">
+                {item.validated ? (
+                  <Check size={14} className="text-success-600 mt-0.5 flex-shrink-0" />
+                ) : (
+                  <div className="w-3.5 h-3.5 border-2 border-gray-300 rounded mt-0.5 flex-shrink-0"></div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className={`text-xs font-medium leading-tight ${
+                    item.validated ? "text-success-800" : "text-gray-700"
+                  }`}>
+                    {item.proposition}
+                  </div>
+                  {item.validated && (
+                    <>
+                      <div className="text-xs text-success-600 italic mt-1">
+                        {item.description}
+                      </div>
+                      <div className="text-xs text-success-500 mt-1">
+                        {new Date(item.timestamp).toLocaleString("fr-FR", datetimeFormat)}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="text-xs text-center text-gray-500 border-t border-gray-200 pt-2">
+          {validatedItems.length}/{allItems.length} objectifs validés
+        </div>
+      </div>
+    );
+  };
+
+  // Déterminer quelles sauvegardes afficher
+  const savesToDisplay = showAllSaves ? saves : saves.slice(0, 3);
+  const hasMoreSaves = saves.length > 3;
+
   return (
     <div>
       <button
@@ -379,179 +476,166 @@ export const SeePreviousHistory = ({
                 <p>Aucune sauvegarde trouvée</p>
               </div>
             ) : (
-              saves.map((save, index) => {
-                const winners = getWinners(save.data.players);
-                const winnerNames = winners.map((w) => w.name);
-                const previousSave =
-                  index < saves.length - 1 ? saves[index + 1] : null;
-                const differences = calculateDifferences(save, previousSave);
-                const isExpanded = expandedDiffs.has(save.id);
+              <>
+                {savesToDisplay.map((save, index) => {
+                  const winners = getWinners(save.data.players);
+                  const winnerNames = winners.map((w) => w.name);
+                  const previousSave =
+                    index < saves.length - 1 ? saves[index + 1] : null;
+                  const differences = calculateDifferences(save, previousSave);
+                  const isExpanded = expandedDiffs.has(save.id);
 
-                return (
-                  <div
-                    key={save.id}
-                    className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors duration-200"
-                  >
-                    <div className="flex items-center gap-3 mb-4">
-                      <Calendar size={16} className="text-primary-500" />
-                      <span className="font-semibold text-gray-800">
-                        {new Date(save.date).toLocaleString(
-                          "fr-FR",
-                          datetimeFormat
+                  return (
+                    <div
+                      key={save.id}
+                      className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors duration-200"
+                    >
+                      <div className="flex items-center gap-3 mb-4">
+                        <Calendar size={16} className="text-primary-500" />
+                        <span className="font-semibold text-gray-800">
+                          {new Date(save.date).toLocaleString(
+                            "fr-FR",
+                            datetimeFormat
+                          )}
+                        </span>
+                        {winners.length > 1 && (
+                          <div className="ml-auto flex items-center gap-1 bg-warning-100 text-warning-700 px-2 py-1 rounded-full text-xs font-medium">
+                            <Trophy size={12} />
+                            Égalité
+                          </div>
                         )}
-                      </span>
-                      {winners.length > 1 && (
-                        <div className="ml-auto flex items-center gap-1 bg-warning-100 text-warning-700 px-2 py-1 rounded-full text-xs font-medium">
-                          <Trophy size={12} />
-                          Égalité
-                        </div>
-                      )}
-                      {differences && (
-                        <Tooltip content="Cette sauvegarde contient des changements par rapport à la précédente">
-                          <button
-                            onClick={() => toggleDiffExpansion(save.id)}
-                            className="ml-auto flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium hover:bg-blue-200 transition-colors duration-200"
-                          >
-                            <Edit size={12} />
-                            Changements
-                            {isExpanded ? (
-                              <ChevronDown size={12} />
-                            ) : (
-                              <ChevronRight size={12} />
-                            )}
-                          </button>
-                        </Tooltip>
-                      )}
-                    </div>
-
-                    {/* Affichage des différences si développé */}
-                    {differences &&
-                      isExpanded &&
-                      renderDifferences(differences)}
-
-                    <div className="space-y-2 my-4">
-                      {save.data.players
-                        .sort(
-                          (a, b) =>
-                            b.validatedItems.length - a.validatedItems.length
-                        )
-                        .map((player, playerIndex) => {
-                          const isWinner = winnerNames.includes(player.name);
-
-                          return (
-                            <div
-                              key={player.id || playerIndex}
-                              className={`flex justify-between items-center p-2 rounded-lg transition-all duration-200 ${
-                                isWinner
-                                  ? "bg-gradient-to-r from-warning-50 to-warning-100 border border-warning-200"
-                                  : "bg-white"
-                              }`}
+                        {differences && (
+                          <Tooltip content="Cette sauvegarde contient des changements par rapport à la précédente">
+                            <button
+                              onClick={() => toggleDiffExpansion(save.id)}
+                              className="ml-auto flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium hover:bg-blue-200 transition-colors duration-200"
                             >
-                              <div className="flex items-center gap-2">
-                                {isWinner && (
-                                  <Trophy
-                                    size={16}
-                                    className={`${
-                                      winners.length > 1
-                                        ? "text-warning-500 animate-bounce-subtle"
-                                        : "text-warning-500"
-                                    }`}
-                                  />
-                                )}
-                                <span
-                                  className={`font-medium ${isWinner ? "text-warning-800" : "text-gray-700"}`}
-                                >
-                                  {player.name}
-                                </span>
-                                {winners.length > 1 && isWinner && (
-                                  <span className="text-xs bg-warning-200 text-warning-800 px-2 py-0.5 rounded-full font-medium">
-                                    Ex æquo
-                                  </span>
-                                )}
-                              </div>
-
-                              <div className="flex items-center gap-2">
-                                <span
-                                  className={`text-sm ${isWinner ? "text-warning-700 font-bold" : "text-gray-600"}`}
-                                >
-                                  {player.validatedItems.length}/
-                                  {save.data.players[0]?.grid?.length || 6}
-                                </span>
-                                {player.validatedItems.length > 0 ? (
-                                  <Tooltip
-                                    content={
-                                      <div className="space-y-2">
-                                        {player.validatedItems.map(
-                                          ([key, item]) => (
-                                            <div key={key} className="text-xs">
-                                              <div className="font-bold flex items-center gap-1">
-                                                <Check
-                                                  size={12}
-                                                  className="text-success-400"
-                                                />
-                                                {
-                                                  save.data.propositions.find(
-                                                    (e) =>
-                                                      e.id ===
-                                                      item.propositionId
-                                                  )?.text
-                                                }
-                                              </div>
-                                              <div className="opacity-90 ml-4">
-                                                {item.description}
-                                              </div>
-                                              <div className="text-xs italic opacity-70 ml-4">
-                                                {new Date(
-                                                  item.timestamp
-                                                ).toLocaleString(
-                                                  "fr-FR",
-                                                  datetimeFormat
-                                                )}
-                                              </div>
-                                            </div>
-                                          )
-                                        )}
-                                      </div>
-                                    }
-                                  >
-                                    <Check
-                                      size={16}
-                                      className="text-success-500"
-                                    />
-                                  </Tooltip>
-                                ) : (
-                                  <X size={16} className="text-gray-300" />
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <div className="flex items-center gap-1">
-                          <FileText size={14} />
-                          {save.data.propositions.length} proposition
-                          {save.data.propositions.length > 1 ? "s" : ""}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Users size={14} />
-                          {save.data.players.length} joueur
-                          {save.data.players.length > 1 ? "s" : ""}
-                        </div>
+                              <Edit size={12} />
+                              Changements
+                              {isExpanded ? (
+                                <ChevronDown size={12} />
+                              ) : (
+                                <ChevronRight size={12} />
+                              )}
+                            </button>
+                          </Tooltip>
+                        )}
                       </div>
 
-                      <button
-                        onClick={() => handleLoadGame(save.data)}
-                        className="px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-soft text-sm font-medium"
-                      >
-                        Charger
-                      </button>
+                      {/* Affichage des différences si développé */}
+                      {differences &&
+                        isExpanded &&
+                        renderDifferences(differences)}
+
+                      <div className="space-y-2 my-4">
+                        {save.data.players
+                          .sort(
+                            (a, b) =>
+                              b.validatedItems.length - a.validatedItems.length
+                          )
+                          .map((player, playerIndex) => {
+                            const isWinner = winnerNames.includes(player.name);
+
+                            return (
+                              <div
+                                key={player.id || playerIndex}
+                                className={`flex justify-between items-center p-2 rounded-lg transition-all duration-200 ${
+                                  isWinner
+                                    ? "bg-gradient-to-r from-warning-50 to-warning-100 border border-warning-200"
+                                    : "bg-white"
+                                }`}
+                              >
+                                <div className="flex items-center gap-2">
+                                  {isWinner && (
+                                    <Trophy
+                                      size={16}
+                                      className={`${
+                                        winners.length > 1
+                                          ? "text-warning-500 animate-bounce-subtle"
+                                          : "text-warning-500"
+                                      }`}
+                                    />
+                                  )}
+                                  <span
+                                    className={`font-medium ${isWinner ? "text-warning-800" : "text-gray-700"}`}
+                                  >
+                                    {player.name}
+                                  </span>
+                                  {winners.length > 1 && isWinner && (
+                                    <span className="text-xs bg-warning-200 text-warning-800 px-2 py-0.5 rounded-full font-medium">
+                                      Ex æquo
+                                    </span>
+                                  )}
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={`text-sm ${isWinner ? "text-warning-700 font-bold" : "text-gray-600"}`}
+                                  >
+                                    {player.validatedItems.length}/
+                                    {save.data.players[0]?.grid?.length || 6}
+                                  </span>
+                                  <Tooltip
+                                    content={createPlayerTooltip(player, save)}
+                                    side="left"
+                                  >
+                                    <div className="cursor-help">
+                                      <Eye size={16} className="text-primary-500 hover:text-primary-600 transition-colors duration-200" />
+                                    </div>
+                                  </Tooltip>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <FileText size={14} />
+                            {save.data.propositions.length} proposition
+                            {save.data.propositions.length > 1 ? "s" : ""}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Users size={14} />
+                            {save.data.players.length} joueur
+                            {save.data.players.length > 1 ? "s" : ""}
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => handleLoadGame(save.data)}
+                          className="px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-soft text-sm font-medium"
+                        >
+                          Charger
+                        </button>
+                      </div>
                     </div>
+                  );
+                })}
+
+                {/* Bouton "Voir plus" / "Voir moins" */}
+                {hasMoreSaves && (
+                  <div className="text-center pt-4 border-t border-gray-200">
+                    <button
+                      onClick={() => setShowAllSaves(!showAllSaves)}
+                      className="flex items-center gap-2 mx-auto px-4 py-2 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-lg hover:from-gray-200 hover:to-gray-300 transition-all duration-200 font-medium text-sm"
+                    >
+                      {showAllSaves ? (
+                        <>
+                          <ChevronUp size={16} />
+                          Voir moins
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown size={16} />
+                          Voir plus ({saves.length - 3} autres)
+                        </>
+                      )}
+                    </button>
                   </div>
-                );
-              })
+                )}
+              </>
             )}
           </div>
         </div>
