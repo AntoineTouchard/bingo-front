@@ -1,5 +1,13 @@
 import React from "react";
-import { Shuffle, Plus, Save, Upload, Download, User, Gamepad2 } from "lucide-react";
+import {
+  Shuffle,
+  Plus,
+  Save,
+  Upload,
+  Download,
+  User,
+  Gamepad2,
+} from "lucide-react";
 import { SeePreviousHistory } from "./SeePreviousHistory";
 import { PropositionManager } from "./PropositionManager";
 import { Tooltip } from "./Tooltip";
@@ -78,29 +86,16 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
               Ajouter joueur
             </button>
 
-            <button
-              onClick={onGenerateNewGrids}
-              className="flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2.5 rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
-            >
-              <Shuffle size={18} />
-              Nouvelles grilles
-            </button>
-
-            {/* Bouton de sauvegarde - visible uniquement quand une partie est chargée */}
-            {isLoadedGame && (
-              <Tooltip content="Sauvegarder cette partie">
-                <button
-                  onClick={onSaveGame}
-                  className="flex items-center gap-2 bg-gradient-to-r from-success-500 to-success-600 text-white px-4 py-2.5 rounded-xl hover:from-success-600 hover:to-success-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
-                >
-                  <Save size={18} />
-                  Sauvegarder
-                </button>
-              </Tooltip>
-            )}
-
             {showAllButtons && (
               <>
+                <button
+                  onClick={onGenerateNewGrids}
+                  className="flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2.5 rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
+                >
+                  <Shuffle size={18} />
+                  Nouvelles grilles
+                </button>
+
                 <button
                   onClick={onDownloadGame}
                   className="flex items-center gap-2 bg-gradient-to-r from-secondary-500 to-secondary-600 text-white px-4 py-2.5 rounded-xl hover:from-secondary-600 hover:to-secondary-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
@@ -122,9 +117,22 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
               </>
             )}
 
+            {/* Bouton de sauvegarde - visible uniquement quand une partie est chargée */}
+            {isLoadedGame && (
+              <Tooltip content="Sauvegarder cette partie">
+                <button
+                  onClick={onSaveGame}
+                  className="flex items-center gap-2 bg-gradient-to-r from-success-500 to-success-600 text-white px-4 py-2.5 rounded-xl hover:from-success-600 hover:to-success-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
+                >
+                  <Save size={18} />
+                  Sauvegarder
+                </button>
+              </Tooltip>
+            )}
+
             <SeePreviousHistory loadThisGame={onLoadThisGame} />
 
-            <Tooltip content="Utilisateurs connectés">
+            <Tooltip content="Utilisateurs sur le site">
               <div className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl font-medium">
                 <User size={18} className="text-primary-500" />
                 <span className="font-bold text-primary-600">
