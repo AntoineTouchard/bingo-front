@@ -1,5 +1,5 @@
 import React from "react";
-import { Shuffle, Plus, Upload, Download, User, Gamepad2 } from "lucide-react";
+import { Shuffle, Plus, Save, Upload, Download, User, Gamepad2 } from "lucide-react";
 import { SeePreviousHistory } from "./SeePreviousHistory";
 import { PropositionManager } from "./PropositionManager";
 import { Tooltip } from "./Tooltip";
@@ -28,11 +28,15 @@ interface GameHeaderProps {
 export const GameHeader: React.FC<GameHeaderProps> = ({
   playerCount,
   maxPlayers,
+  isChanged,
+  isLoadedGame,
+  hasUnsavedChanges,
   playerOnline,
   showAllButtons,
   propositions,
   onAddPlayer,
   onGenerateNewGrids,
+  onSaveGame,
   onDownloadGame,
   onLoadGame,
   onLoadThisGame,
@@ -74,16 +78,40 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
               Ajouter joueur
             </button>
 
+            <button
+              onClick={onGenerateNewGrids}
+              className="flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2.5 rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
+            >
+              <Shuffle size={18} />
+              Nouvelles grilles
+            </button>
+
+            {/* Bouton de sauvegarde - visible quand il y a des changements ou après chargement */}
+            {(isChanged || isLoadedGame || hasUnsavedChanges) && (
+              <Tooltip content={
+                isChanged ? "Sauvegarder les modifications" : 
+                isLoadedGame ? "Sauvegarder cette partie" :
+                "Sauvegarder les changements"
+              }>
+                <button
+                  onClick={onSaveGame}
+                  className={`flex items-center gap-2 text-white px-4 py-2.5 rounded-xl transition-all duration-200 shadow-soft hover:shadow-medium font-medium ${
+                    isChanged || hasUnsavedChanges
+                      ? "bg-gradient-to-r from-warning-500 to-warning-600 hover:from-warning-600 hover:to-warning-700 animate-pulse"
+                      : "bg-gradient-to-r from-success-500 to-success-600 hover:from-success-600 hover:to-success-700"
+                  }`}
+                >
+                  <Save size={18} />
+                  Sauvegarder
+                  {(isChanged || hasUnsavedChanges) && (
+                    <div className="w-2 h-2 bg-warning-200 rounded-full animate-bounce"></div>
+                  )}
+                </button>
+              </Tooltip>
+            )}
+
             {showAllButtons && (
               <>
-                <button
-                  onClick={onGenerateNewGrids}
-                  className="flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2.5 rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
-                >
-                  <Shuffle size={18} />
-                  Nouvelles grilles
-                </button>
-
                 <button
                   onClick={onDownloadGame}
                   className="flex items-center gap-2 bg-gradient-to-r from-secondary-500 to-secondary-600 text-white px-4 py-2.5 rounded-xl hover:from-secondary-600 hover:to-secondary-700 transition-all duration-200 shadow-soft hover:shadow-medium font-medium"
