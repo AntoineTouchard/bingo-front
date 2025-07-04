@@ -145,36 +145,56 @@ export const BingoGrid = ({
     const propositionText = getPropositionById(itemId);
 
     // Fonction pour tronquer le texte élégamment
-    const truncateText = (text: string, maxLength: number = 80) => {
+    const truncateText = (text: string, maxLength: number = 60) => {
       if (text.length <= maxLength) return text;
       return text.substring(0, maxLength).trim() + "...";
     };
 
     const description = validatedItem?.description || "";
-    const isTextTruncated = description.length > 80;
+    const isDescriptionTruncated = description.length > 60;
 
     return (
       <div key={index} className="relative group">
         <div
           onClick={() => handleItemClick(index, propositionText)}
-          className={`p-4 border-2 rounded-xl h-[160px] text-center transition-all duration-300 text-sm relative overflow-hidden ${
+          className={`p-4 border-2 rounded-xl h-[180px] text-center transition-all duration-300 text-sm relative overflow-hidden flex flex-col ${
             isValidated
               ? "bg-gradient-to-br from-success-500 to-success-600 text-white border-success-600 shadow-medium transform scale-105"
               : "border-gray-200 hover:border-primary-300 hover:bg-primary-50 hover:shadow-soft bg-white cursor-pointer"
           }`}
         >
-          <div
-            className={`text-sm font-bold leading-tight ${
-              isValidated ? "text-white" : "text-gray-700"
-            }`}
-          >
-            {propositionText}
+          {/* Titre de la proposition */}
+          <div className="flex-shrink-0 mb-3">
+            <div
+              className={`text-sm font-bold leading-tight ${
+                isValidated ? "text-white" : "text-gray-700"
+              }`}
+            >
+              {propositionText.length > 80 ? (
+                <Tooltip
+                  content={
+                    <div className="max-w-xs">
+                      <div className="text-sm leading-relaxed">{propositionText}</div>
+                    </div>
+                  }
+                  side="top"
+                >
+                  <div className="cursor-help">
+                    {truncateText(propositionText, 80)}
+                  </div>
+                </Tooltip>
+              ) : (
+                propositionText
+              )}
+            </div>
           </div>
           
+          {/* Zone de contenu validé */}
           {isValidated && (
-            <>
-              <div className="mt-3 mb-8">
-                {isTextTruncated ? (
+            <div className="flex-1 flex flex-col justify-between min-h-0">
+              {/* Description */}
+              <div className="flex-1 flex items-center justify-center mb-3">
+                {isDescriptionTruncated ? (
                   <Tooltip
                     content={
                       <div className="max-w-xs">
@@ -183,36 +203,40 @@ export const BingoGrid = ({
                     }
                     side="top"
                   >
-                    <div className="text-xs italic opacity-90 leading-tight cursor-help">
+                    <div className="text-xs italic opacity-90 leading-tight cursor-help text-center">
                       {truncateText(description)}
                     </div>
                   </Tooltip>
                 ) : (
-                  <div className="text-xs italic opacity-90 leading-tight">
+                  <div className="text-xs italic opacity-90 leading-tight text-center">
                     {description}
                   </div>
                 )}
               </div>
               
-              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 text-xs italic opacity-80 flex items-center gap-1">
+              {/* Date en bas */}
+              <div className="flex-shrink-0 text-xs italic opacity-80 flex items-center justify-center gap-1">
                 <Check size={12} className="text-success-200" />
                 {new Date(validatedItem?.timestamp).toLocaleString(
                   "fr-FR",
                   shortDateFormat
                 )}
               </div>
+              
+              {/* Bouton de suppression */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleRemoveValidation(index);
                 }}
-                className="absolute top-2 right-2 p-1 rounded-full hover:bg-success-600 opacity-0 group-hover:opacity-100 transition-colors duration-200"
+                className="absolute top-2 right-2 p-1 rounded-full hover:bg-success-600 opacity-0 group-hover:opacity-100 transition-all duration-200"
               >
                 <XIcon size={14} />
               </button>
-            </>
+            </div>
           )}
           
+          {/* Effet de survol pour les cartes non validées */}
           {!isValidated && (
             <div className="absolute inset-0 bg-gradient-to-br from-primary-500/0 to-secondary-500/0 group-hover:from-primary-500/5 group-hover:to-secondary-500/5 transition-all duration-300 rounded-xl"></div>
           )}
