@@ -12,6 +12,7 @@ interface UseGameStateReturn {
   setPlayerStates: (playerStates: PlayerState[]) => void;
   setIsChanged: (changed: boolean) => void;
   setIsLoadedGame: (loaded: boolean) => void;
+  setHasUnsavedChanges: (hasChanges: boolean) => void;
   generateNewGrids: (playerCount?: number) => void;
   addPlayer: () => void;
   removePlayer: (index: number) => void;
@@ -156,7 +157,7 @@ export const useGameState = (
     setIsChanged(true);
   }, []);
 
-  const loadGameState = useCallback((gameState: GameState, updateIsChanged = true) => {
+  const loadGameState = useCallback((gameState: GameState, updateIsChanged = true, markAsLoaded = true) => {
     if (hasUnsavedChanges && !confirmUnsavedChanges()) {
       return;
     }
@@ -171,7 +172,7 @@ export const useGameState = (
       }))
     );
     setIsChanged(false); // Important: réinitialiser isChanged lors du chargement
-    setIsLoadedGame(true);
+    setIsLoadedGame(markAsLoaded); // Permettre de contrôler si on marque comme "chargé"
     setHasUnsavedChanges(false);
   }, [hasUnsavedChanges, confirmUnsavedChanges]);
 
@@ -185,6 +186,7 @@ export const useGameState = (
     setPlayerStates,
     setIsChanged,
     setIsLoadedGame,
+    setHasUnsavedChanges,
     generateNewGrids,
     addPlayer,
     removePlayer,

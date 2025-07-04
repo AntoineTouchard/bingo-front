@@ -68,7 +68,7 @@ function App() {
 
   // Stabiliser la fonction handleNewChanges avec useCallback
   const handleNewChanges = useCallback((data: any) => {
-    loadGameState(data, false);
+    loadGameState(data, false, true); // Marquer comme chargé pour les changements réseau
   }, [loadGameState]);
 
   const { playerOnline } = useSocket(handleNewChanges);
@@ -116,7 +116,7 @@ function App() {
       try {
         const gameStateData = await loadGameFromFile(file);
         if (gameStateData) {
-          loadGameState(gameStateData);
+          loadGameState(gameStateData, true, true); // Marquer comme chargé pour les fichiers
         }
       } catch (error) {
         alert(error instanceof Error ? error.message : "Erreur lors du chargement du fichier");
@@ -128,7 +128,8 @@ function App() {
     try {
       const lastGameState = await loadLastGame();
       if (lastGameState) {
-        loadGameState(lastGameState, false);
+        // Au démarrage, ne pas marquer comme "partie chargée"
+        loadGameState(lastGameState, false, false);
       } else {
         generateNewGrids();
       }
@@ -142,6 +143,12 @@ function App() {
     if (confirmUnsavedChanges()) {
       handleLoadLastGame();
     }
+  };
+
+  // Fonction pour charger une partie depuis l'historique
+  const handleLoadGameFromHistory = (gameStateData: any) => {
+    // Marquer explicitement comme "partie chargée" pour afficher le bouton sauvegarder
+    loadGameState(gameStateData, true, true);
   };
 
   useEffect(() => {
@@ -165,7 +172,7 @@ function App() {
           onSaveGame={handleSaveGame}
           onDownloadGame={handleDownloadGame}
           onLoadGame={handleLoadGame}
-          onLoadThisGame={loadGameState}
+          onLoadThisGame={handleLoadGameFromHistory}
           onAddProposition={addProposition}
           onRemoveProposition={removeProposition}
           onCancelChanges={handleCancelChanges}
