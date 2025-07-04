@@ -30,6 +30,7 @@ export const SeePreviousHistory = ({
   const [saves, setSaves] = useState<SavesResponse[]>([]);
   const [expandedDiffs, setExpandedDiffs] = useState<Set<string>>(new Set());
   const [showAllSaves, setShowAllSaves] = useState(false);
+  const [expandedPlayers, setExpandedPlayers] = useState<Set<string>>(new Set());
 
   const handleLoadGame = (data: GameState) => {
     loadThisGame(data);
@@ -44,6 +45,16 @@ export const SeePreviousHistory = ({
       newExpanded.add(saveId);
     }
     setExpandedDiffs(newExpanded);
+  };
+
+  const togglePlayersExpansion = (saveId: string) => {
+    const newExpanded = new Set(expandedPlayers);
+    if (newExpanded.has(saveId)) {
+      newExpanded.delete(saveId);
+    } else {
+      newExpanded.add(saveId);
+    }
+    setExpandedPlayers(newExpanded);
   };
 
   useEffect(() => {
@@ -484,6 +495,18 @@ export const SeePreviousHistory = ({
                     index < saves.length - 1 ? saves[index + 1] : null;
                   const differences = calculateDifferences(save, previousSave);
                   const isExpanded = expandedDiffs.has(save.id);
+                  const isPlayersExpanded = expandedPlayers.has(save.id);
+
+                  // Trier les joueurs par score
+                  const sortedPlayers = [...save.data.players].sort(
+                    (a, b) => b.validatedItems.length - a.validatedItems.length
+                  );
+
+                  // Déterminer quels joueurs afficher
+                  const playersToDisplay = isPlayersExpanded 
+                    ? sortedPlayers 
+                    : sortedPlayers.slice(0, 3);
+                  const hasMorePlayers = sortedPlayers.length > 3;
 
                   return (
                     <div
@@ -528,65 +551,82 @@ export const SeePreviousHistory = ({
                         renderDifferences(differences)}
 
                       <div className="space-y-2 my-4">
-                        {save.data.players
-                          .sort(
-                            (a, b) =>
-                              b.validatedItems.length - a.validatedItems.length
-                          )
-                          .map((player, playerIndex) => {
-                            const isWinner = winnerNames.includes(player.name);
+                        {playersToDisplay.map((player, playerIndex) => {
+                          const isWinner = winnerNames.includes(player.name);
 
-                            return (
-                              <div
-                                key={player.id || playerIndex}
-                                className={`flex justify-between items-center p-2 rounded-lg transition-all duration-200 ${
-                                  isWinner
-                                    ? "bg-gradient-to-r from-warning-50 to-warning-100 border border-warning-200"
-                                    : "bg-white"
-                                }`}
-                              >
-                                <div className="flex items-center gap-2">
-                                  {isWinner && (
-                                    <Trophy
-                                      size={16}
-                                      className={`${
-                                        winners.length > 1
-                                          ? "text-warning-500 animate-bounce-subtle"
-                                          : "text-warning-500"
-                                      }`}
-                                    />
-                                  )}
-                                  <span
-                                    className={`font-medium ${isWinner ? "text-warning-800" : "text-gray-700"}`}
-                                  >
-                                    {player.name}
+                          return (
+                            <div
+                              key={player.id || playerIndex}
+                              className={`flex justify-between items-center p-2 rounded-lg transition-all duration-200 ${
+                                isWinner
+                                  ? "bg-gradient-to-r from-warning-50 to-warning-100 border border-warning-200"
+                                  : "bg-white"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                {isWinner && (
+                                  <Trophy
+                                    size={16}
+                                    className={`${
+                                      winners.length > 1
+                                        ? "text-warning-500 animate-bounce-subtle"
+                                        : "text-warning-500"
+                                    }`}
+                                  />
+                                )}
+                                <span
+                                  className={`font-medium ${isWinner ? "text-warning-800" : "text-gray-700"}`}
+                                >
+                                  {player.name}
+                                </span>
+                                {winners.length > 1 && isWinner && (
+                                  <span className="text-xs bg-warning-200 text-warning-800 px-2 py-0.5 rounded-full font-medium">
+                                    Ex æquo
                                   </span>
-                                  {winners.length > 1 && isWinner && (
-                                    <span className="text-xs bg-warning-200 text-warning-800 px-2 py-0.5 rounded-full font-medium">
-                                      Ex æquo
-                                    </span>
-                                  )}
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                  <span
-                                    className={`text-sm ${isWinner ? "text-warning-700 font-bold" : "text-gray-600"}`}
-                                  >
-                                    {player.validatedItems.length}/
-                                    {save.data.players[0]?.grid?.length || 6}
-                                  </span>
-                                  <Tooltip
-                                    content={createPlayerTooltip(player, save)}
-                                    side="left"
-                                  >
-                                    <div className="cursor-help">
-                                      <Eye size={16} className="text-primary-500 hover:text-primary-600 transition-colors duration-200" />
-                                    </div>
-                                  </Tooltip>
-                                </div>
+                                )}
                               </div>
-                            );
-                          })}
+
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className={`text-sm ${isWinner ? "text-warning-700 font-bold" : "text-gray-600"}`}
+                                >
+                                  {player.validatedItems.length}/
+                                  {save.data.players[0]?.grid?.length || 6}
+                                </span>
+                                <Tooltip
+                                  content={createPlayerTooltip(player, save)}
+                                  side="left"
+                                >
+                                  <div className="cursor-help">
+                                    <Eye size={16} className="text-primary-500 hover:text-primary-600 transition-colors duration-200" />
+                                  </div>
+                                </Tooltip>
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {/* Bouton "Voir plus" / "Voir moins" pour les joueurs */}
+                        {hasMorePlayers && (
+                          <div className="text-center pt-2">
+                            <button
+                              onClick={() => togglePlayersExpansion(save.id)}
+                              className="flex items-center gap-1 mx-auto px-3 py-1 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-all duration-200 text-xs font-medium"
+                            >
+                              {isPlayersExpanded ? (
+                                <>
+                                  <ChevronUp size={14} />
+                                  Voir moins
+                                </>
+                              ) : (
+                                <>
+                                  <ChevronDown size={14} />
+                                  Voir plus ({sortedPlayers.length - 3} autres)
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex items-center justify-between">
@@ -614,7 +654,7 @@ export const SeePreviousHistory = ({
                   );
                 })}
 
-                {/* Bouton "Voir plus" / "Voir moins" */}
+                {/* Bouton "Voir plus" / "Voir moins" pour les sauvegardes */}
                 {hasMoreSaves && (
                   <div className="text-center pt-4 border-t border-gray-200">
                     <button
